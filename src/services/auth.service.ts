@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   async signin(user: User, jwt: JwtService): Promise<any> {
-    const foundUser = await this.userModel.findOne({ email: user.email }).exec();
+    const foundUser = await this.userModel.findOne({ email: user.email,active:true }).exec();
     if (foundUser) {
       const { password } = foundUser;
       if (await bcrypt.compare(user.password, password)) {
@@ -42,6 +42,17 @@ export class AuthService {
       return new HttpException('Incorrect username or password', HttpStatus.UNAUTHORIZED)
     }
     return new HttpException('Incorrect username or password', HttpStatus.UNAUTHORIZED)
+  }
+
+  async activateAccount(email: string, otp: number): Promise<any> {
+    const foundUser = await this.userModel.findOne({ email: email,active:false }).exec();
+    if(foundUser){
+      if(foundUser.otp === otp){
+        this.userModel.findByIdAndUpdate(foundUser._id, {active:true});
+      }else{
+        return new HttpException('Invalid OTP', HttpStatus.UNAUTHORIZED)
+      }
+    }
   }
 
   async getOne(email): Promise<User> {

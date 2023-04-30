@@ -24,17 +24,19 @@ export class AuthController {
     // this.eventEmitter.emit('verify_mail',
     //   new MailEvent(this.mailService, newUser)
     // )
+      const otp = newUser.otp;
+      await this.mailService.sendMail({
+        to:user.email,
+        from:"no-reply@goldpay.com",
+        subject: 'Account verification',
+        template:'registration-email',
+        context: {
+          data:otp
+        }
+      });
 
-      // await this.mailService.sendMail({
-      //   to:user.email,
-      //   from:"nani.bommidi93@gmail.com",
-      //   subject: 'Account verification',
-      //   template:'registration-email',
-      //   context: {
-      //     data:newUser
-      //   }
-      //
-      // });
+    console.log(newUser);
+
     return response.status(HttpStatus.CREATED).json({
       newUser
     })

@@ -28,7 +28,7 @@ export class User {
     @Prop({length:8})
     referral_code: string
 
-    @Prop({length:6})
+    @Prop({length:6, default: Math.floor(100000 + Math.random() * 900000)})
     otp: number
 
     @Prop({length:6, default: Math.floor(100000 + Math.random() * 900000)})
@@ -36,6 +36,9 @@ export class User {
 
     @Prop({length:6})
     transaction_pin: number
+
+    @Prop({default:false})
+    active: boolean
 
     @Prop({default: Helper.addTime(15) })
     expiryDate: Date
