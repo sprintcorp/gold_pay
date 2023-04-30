@@ -44,14 +44,29 @@ export class AuthService {
     return new HttpException('Incorrect username or password', HttpStatus.UNAUTHORIZED)
   }
 
-  async activateAccount(email: string, otp: number): Promise<any> {
-    const foundUser = await this.userModel.findOne({ email: email,active:false }).exec();
+  async activateAccount(user: User): Promise<any> {
+    const foundUser = await this.userModel.findOne({ email: user.email,active:false }).exec();
+
     if(foundUser){
-      if(foundUser.otp === otp){
-        this.userModel.findByIdAndUpdate(foundUser._id, {active:true});
+      if(foundUser.otp === user.otp){
+        await this.userModel.findByIdAndUpdate(foundUser._id, {active:true});
+        return "User activated successfully.";
       }else{
         return new HttpException('Invalid OTP', HttpStatus.UNAUTHORIZED)
       }
+    }else{
+      return new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+  }
+
+  async sendVerificationOTP(user: User): Promise<any>{
+    const foundUser = await this.userModel.findOne({ email: user.email,active:false }).exec();
+    if(foundUser){
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp});
+        return otp;
+    }else{
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
   }
 

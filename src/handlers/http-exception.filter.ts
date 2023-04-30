@@ -35,9 +35,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // Throw an exceptions for either
     // MongoError, ValidationError, TypeError, CastError and Error
     if (exception.message) {
-      responseMessage("Error", exception.message);
+      responseMessage("Error", exception);
     } else {
-      responseMessage(exception.name, exception.message);
+      responseMessage(exception.name, exception);
     }
   }
 }

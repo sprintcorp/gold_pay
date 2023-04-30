@@ -35,8 +35,6 @@ export class AuthController {
         }
       });
 
-    console.log(newUser);
-
     return response.status(HttpStatus.CREATED).json({
       newUser
     })
@@ -46,5 +44,26 @@ export class AuthController {
   async SignIn(@Res() response, @Body() user: User) {
     const token = await this.authService.signin(user, this.jwtService);
     return response.status(HttpStatus.OK).json(token)
+  }
+
+  @Post('/verify')
+  async VerifyUser(@Res() response, @Body() request) {
+    const verify = await this.authService.activateAccount(request);
+    return response.status(HttpStatus.OK).json(verify)
+  }
+
+  @Post('/resend-otp')
+  async sendVerificationOTP(@Res() response, @Body() request){
+    const otp = await this.authService.sendVerificationOTP(request);
+    await this.mailService.sendMail({
+      to:request.email,
+      from:"no-reply@goldpay.com",
+      subject: 'Account verification',
+      template:'registration-email',
+      context: {
+        data:otp
+      }
+    });
+    return response.status(HttpStatus.OK).json({'message': 'Account verification otp successful sent'})
   }
 }
