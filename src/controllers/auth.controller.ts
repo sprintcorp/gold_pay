@@ -64,6 +64,6 @@ export class AuthController {
         data:otp
       }
     });
-    return response.status(HttpStatus.OK).json({'message': 'Account verification otp successful sent'})
+    return response.status(HttpStatus.OK).json({'message': 'Account verification OTP successful sent'})
   }
 }
