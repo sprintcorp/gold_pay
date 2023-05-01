@@ -17,7 +17,10 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
     EventEmitterModule.forRoot(),
     MailerModule.forRootAsync({
       useFactory: () => ({
