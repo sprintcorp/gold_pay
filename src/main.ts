@@ -9,8 +9,8 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(new ValidationPipe({whitelist: true}));
 
-  console.log(parseInt(process.env.APP_PORT, 10));
-  await app.listen(parseInt(process.env.APP_PORT, 10) || 3000);
+  console.log(parseInt(process.env.PORT, 10));
+  await app.listen(parseInt(process.env.PORT, 10) || 3000);
 
 }
 bootstrap();
