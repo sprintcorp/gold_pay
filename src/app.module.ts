@@ -13,9 +13,11 @@ import { secret } from "./utils/constants";
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     EventEmitterModule.forRoot(),
     MailerModule.forRootAsync({
       useFactory: () => ({
