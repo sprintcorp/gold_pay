@@ -1,16 +1,20 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 export type UserDocument = User & Document;
 import {Helper} from "../utils/helper";
-import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
+import { IsEmail, IsEmpty, IsNotEmpty, MaxLength, MinLength } from "class-validator";
 
 
 @Schema()
 export class User {
 
-    @Prop({required:false})
+    @Prop()
+    @MaxLength(50)
+    @MinLength(0)
     firstname: string;
 
-    @Prop({required:false})
+    @Prop()
+    @MaxLength(50)
+    @MinLength(0)
     lastname: string;
 
     @Prop({required:true, unique:true, lowercase:true})

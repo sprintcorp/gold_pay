@@ -18,6 +18,7 @@ export class AuthController {
 
   @Post('/signup')
   async Signup(@Res() response, @Body() user: User) {
+
     const newUser = await this.authService.signup(user, response);
 
 
