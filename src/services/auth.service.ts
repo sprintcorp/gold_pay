@@ -19,6 +19,8 @@ export class AuthService {
     const reqBody = {
       referral_code: user.referral_code,
       email: user.email,
+      firstname: user.firstname,
+      lastname: user.lastname,
       password: hash
     }
     // try{
