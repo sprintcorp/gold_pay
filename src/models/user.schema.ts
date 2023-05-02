@@ -1,35 +1,45 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 export type UserDocument = User & Document;
 import {Helper} from "../utils/helper";
-import { IsEmail, IsEmpty, IsNotEmpty, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsEmpty, IsNotEmpty, IsOptional, MaxLength, MinLength } from "class-validator";
 
 
 @Schema()
 export class User {
 
     @Prop()
-    @MaxLength(50)
-    @MinLength(0)
+    // @MaxLength(50)
+    // @MinLength(0)
+    // @IsOptional()
     firstname: string;
 
     @Prop()
-    @MaxLength(50)
-    @MinLength(0)
+    // @MaxLength(50)
+    // @MinLength(0)
+    // @IsOptional()
     lastname: string;
 
     @Prop({required:true, unique:true, lowercase:true})
-    @IsEmail()
+    // @IsEmail()
     email: string;
 
+    @Prop({required:true, unique:true, lowercase:true})
+    // @MaxLength(50)
+    // @MinLength(0)
+    username: string;
+
     @Prop()
-    @IsNotEmpty()
-    @MinLength(6)
+    // @IsNotEmpty()
+    // @MinLength(6)
     password: string
 
     @Prop({length:8, default: Helper.uniqueRandomNumber(8, )})
     user_referral_code: string
 
     @Prop({length:8})
+    // @MaxLength(8)
+    // @MinLength(8)
+    // @IsOptional()
     referral_code: string
 
     @Prop({length:6, default: Math.floor(100000 + Math.random() * 900000)})

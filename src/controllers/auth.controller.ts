@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt'
 import { MailerService } from "@nestjs-modules/mailer";
 // import { EventEmitterModule } from "@nestjs/event-emitter";
 import {MailEvent} from "../events/mail.event";
+import { AuthDto } from "../dto/auth.dto";
 
 
 @Controller('/api/v1/auth')
@@ -17,7 +18,7 @@ export class AuthController {
   }
 
   @Post('/signup')
-  async Signup(@Res() response, @Body() user: User) {
+  async Signup(@Res() response, @Body() user: AuthDto) {
 
     const newUser = await this.authService.signup(user, response);
 
@@ -42,9 +43,9 @@ export class AuthController {
   }
 
   @Post('/signin')
-  async SignIn(@Res() response, @Body() user: User) {
-    const token = await this.authService.signin(user, this.jwtService);
-    return response.status(HttpStatus.OK).json(token)
+  async SignIn(@Res() response, @Body() request) {
+    const data = await this.authService.signin(request, this.jwtService);
+    return response.status(data.status).json({'data':data.response})
   }
 
   @Post('/verify')
@@ -66,5 +67,26 @@ export class AuthController {
       }
     });
     return response.status(HttpStatus.OK).json({'message': 'Account verification OTP successful sent to your email'})
+  }
+
+  @Post('/password-token')
+  async sendPasswordOTP(@Res() response, @Body() request){
+    const otp = await this.authService.sendPasswordOTP(request);
+    await this.mailService.sendMail({
+      to:request.email,
+      from:"no-reply@goldpay.com",
+      subject: 'Reset Password OTP',
+      template:'reset-password-email',
+      context: {
+        data:otp
+      }
+    });
+    return response.status(HttpStatus.OK).json({'message': 'OTP successful sent to your email'})
+  }
+
+  @Post('/password-reset')
+  async ResetPassword(@Res() response, @Body() request) {
+    const data = await this.authService.resetPassword(request);
+    return response.status(data.status).json({'data':data.response})
   }
 }

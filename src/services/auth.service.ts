@@ -5,6 +5,8 @@ import { User, UserDocument } from "../models/user.schema";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { OnEvent } from "@nestjs/event-emitter";
+import { AuthDto } from "../dto/auth.dto";
+import { Helper } from "../utils/helper";
 
 @Injectable()
 export class AuthService {
@@ -13,7 +15,7 @@ export class AuthService {
   }
 
   @OnEvent('verify_mail')
-  async signup(user: User, @Res() response): Promise<any> {
+  async signup(user: AuthDto, @Res() response): Promise<any> {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
     const reqBody = {
@@ -21,6 +23,7 @@ export class AuthService {
       email: user.email,
       firstname: user.firstname,
       lastname: user.lastname,
+      username: user.username,
       password: hash
     }
     // try{
@@ -31,19 +34,25 @@ export class AuthService {
     // }
   }
 
-  async signin(user: User, jwt: JwtService): Promise<any> {
-    const foundUser = await this.userModel.findOne({ email: user.email,active:true }).exec();
+  async signin(user, jwt: JwtService): Promise<any> {
+
+    let foundUser = await this.userModel.findOne({ email: user.email,active:true }).exec();
+    if(user.username && user.username !== ''){
+      foundUser = await this.userModel.findOne({ username: user.username,active:true }).exec();
+    }
+
     if (foundUser) {
       const { password } = foundUser;
       if (await bcrypt.compare(user.password, password)) {
-        const payload = { email: user.email };
+        const payload = { email: foundUser.email };
         return {
-          token: jwt.sign(payload),
+          'response': jwt.sign(payload),
+          'status':HttpStatus.OK
         };
       }
-      return new HttpException('Incorrect username or password', HttpStatus.UNAUTHORIZED)
+      return {'response':"Incorrect username or password", 'status':HttpStatus.UNAUTHORIZED}
     }
-    return new HttpException('Incorrect username or password', HttpStatus.UNAUTHORIZED)
+    return {'response':"User does not exit within the system", 'status':HttpStatus.NOT_FOUND}
   }
 
   async activateAccount(user: User): Promise<any> {
@@ -62,11 +71,44 @@ export class AuthService {
   }
 
   async sendVerificationOTP(user: User): Promise<any>{
-    const foundUser = await this.userModel.findOne({ email: user.email,active:false }).exec();
+    let foundUser = await this.userModel.findOne({ email: user.email,active:false }).exec();
+    if(user.username && user.username !== ''){
+      foundUser = await this.userModel.findOne({ username: user.username,active:false }).exec();
+    }
     if(foundUser){
         const otp = Math.floor(100000 + Math.random() * 900000);
-        await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp});
+        await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)});
         return otp;
+    }else{
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+  }
+
+  async sendPasswordOTP(user: User): Promise<any>{
+    let foundUser = await this.userModel.findOne({ email: user.email,active:true }).exec();
+    if(user.username && user.username !== ''){
+      foundUser = await this.userModel.findOne({ username: user.username,active:true }).exec();
+    }
+    if(foundUser){
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)});
+      return otp;
+    }else{
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+  }
+
+  async resetPassword(user): Promise<any>{
+    let foundUser = await this.userModel.findOne({ email: user.email,otp:user.otp }).exec();
+
+    console.log(user);
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(user.password, salt);
+
+    if(foundUser){
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      await this.userModel.findByIdAndUpdate(foundUser._id, {password:hash});
+      return {'response':"Password reset successfully", 'status':HttpStatus.OK}
     }else{
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
