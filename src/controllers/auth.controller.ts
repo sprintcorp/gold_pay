@@ -89,4 +89,10 @@ export class AuthController {
     const data = await this.authService.resetPassword(request);
     return response.status(data.status).json({'data':data.response})
   }
+
+  @Post('/login-pin')
+  async PinLogin(@Res() response, @Body() request) {
+    const data = await this.authService.pinLogin(request, this.jwtService);
+    return response.status(data.status).json({'data':data.response})
+  }
 }

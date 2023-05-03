@@ -101,7 +101,6 @@ export class AuthService {
   async resetPassword(user): Promise<any>{
     let foundUser = await this.userModel.findOne({ email: user.email,otp:user.otp }).exec();
 
-    console.log(user);
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
 
@@ -112,6 +111,22 @@ export class AuthService {
     }else{
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
+  }
+
+  async pinLogin(user, jwt: JwtService): Promise<any> {
+    let foundUser = await this.userModel.findOne({ email: user.email, login_pin: user.login_pin, active:true }).exec();
+
+    if (foundUser) {
+        const payload = { email: foundUser.email };
+        return {
+          'response': jwt.sign(payload),
+          'status':HttpStatus.OK
+        };
+      }else {
+      return { 'response': "Invalid user pin", 'status': HttpStatus.UNAUTHORIZED }
+    }
+
+    return {'response':"User does not exit within the system", 'status':HttpStatus.NOT_FOUND}
   }
 
   async getOne(email): Promise<User> {
