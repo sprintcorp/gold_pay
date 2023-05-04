@@ -26,6 +26,14 @@ export class UserDto{
   @MinLength(6)
   public password: string;
 
+  @IsOptional()
+  @MinLength(6)
+  public old_password: string;
+
+  @IsOptional()
+  @MinLength(6)
+  public confirm_password: string;
+
   public user_referral_code: string;
 
   @MaxLength(8)

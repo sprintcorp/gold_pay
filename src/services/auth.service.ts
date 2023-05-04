@@ -8,6 +8,7 @@ import { OnEvent } from "@nestjs/event-emitter";
 import { AuthDto } from "../dto/auth.dto";
 import { Helper } from "../utils/helper";
 import { AuthResponse } from "../transformers/auth.response";
+import { response } from "express";
 
 @Injectable()
 export class AuthService {
@@ -131,6 +132,17 @@ export class AuthService {
   }
 
   async updateUser(user, request): Promise<any>{
+    if(user.hasOwnProperty('password')){
+      if (!await bcrypt.compare(user.old_password, request.user.password)) {
+        return {'response':"Old password is incorrect", 'status':HttpStatus.NOT_FOUND}
+      }else if (user.password !== user.confirm_password ){
+        return {'response':"Password must be same as confirm password", 'status':HttpStatus.NOT_FOUND}
+      }else{
+        const salt = await bcrypt.genSalt();
+        user.password = await bcrypt.hash(user.password, salt);
+      }
+    }
+
     const response = await this.userModel.findByIdAndUpdate(request.user._id, user)
     return { 'response': response, 'status': HttpStatus.OK }
   }

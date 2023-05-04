@@ -4,7 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  InternalServerErrorException, BadRequestException, MethodNotAllowedException
+  InternalServerErrorException, BadRequestException, MethodNotAllowedException, NotFoundException
 } from "@nestjs/common";
 
 @Catch()
@@ -40,7 +40,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         HttpStatus.NOT_ACCEPTABLE);
     } else if(exception instanceof BadRequestException){
       responseMessage(exception.name, exception.getResponse(), HttpStatus.BAD_REQUEST);
-    }else if(exception instanceof MethodNotAllowedException){
+    }else if(exception instanceof NotFoundException){
       console.log(exception)
       responseMessage(exception.name, exception.getResponse(), HttpStatus.METHOD_NOT_ALLOWED);
     } else if(exception instanceof TypeError){

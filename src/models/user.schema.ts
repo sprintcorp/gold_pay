@@ -59,5 +59,6 @@ export class User {
 
     @Prop({default: Date.now() })
     createdDate: Date
+
 }
 export const UserSchema = SchemaFactory.createForClass(User)
