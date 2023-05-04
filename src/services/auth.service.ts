@@ -62,7 +62,7 @@ export class AuthService {
 
     if(foundUser){
       if(foundUser.otp === user.otp){
-        await this.userModel.findByIdAndUpdate(foundUser._id, {active:true});
+        await this.userModel.findByIdAndUpdate(foundUser._id, {active:true}, { new: true });
         return "User activated successfully.";
       }else{
         return new HttpException('Invalid OTP', HttpStatus.UNAUTHORIZED)
@@ -79,7 +79,7 @@ export class AuthService {
     }
     if(foundUser){
         const otp = Math.floor(100000 + Math.random() * 900000);
-        await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)});
+        await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)}, { new: true });
         return otp;
     }else{
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
@@ -93,7 +93,7 @@ export class AuthService {
     }
     if(foundUser){
       const otp = Math.floor(100000 + Math.random() * 900000);
-      await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)});
+      await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)}, { new: true });
       return otp;
     }else{
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
@@ -108,7 +108,7 @@ export class AuthService {
 
     if(foundUser){
       const otp = Math.floor(100000 + Math.random() * 900000);
-      await this.userModel.findByIdAndUpdate(foundUser._id, {password:hash});
+      await this.userModel.findByIdAndUpdate(foundUser._id, {password:hash},{ new: true });
       return {'response':"Password reset successfully", 'status':HttpStatus.OK}
     }else{
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
@@ -132,18 +132,30 @@ export class AuthService {
   }
 
   async updateUser(user, request): Promise<any>{
-    if(user.hasOwnProperty('password')){
+    if(user.hasOwnProperty('old_password')){
       if (!await bcrypt.compare(user.old_password, request.user.password)) {
-        return {'response':"Old password is incorrect", 'status':HttpStatus.NOT_FOUND}
+        throw new HttpException('Old password is incorrect', HttpStatus.NOT_FOUND);
       }else if (user.password !== user.confirm_password ){
-        return {'response':"Password must be same as confirm password", 'status':HttpStatus.NOT_FOUND}
+        throw new HttpException("Password must be same as confirm password", HttpStatus.NOT_FOUND)
       }else{
         const salt = await bcrypt.genSalt();
         user.password = await bcrypt.hash(user.password, salt);
       }
     }
 
-    const response = await this.userModel.findByIdAndUpdate(request.user._id, user)
+    if((!user.old_password && user.hasOwnProperty('login_pin')) || (!user.old_password && user.hasOwnProperty('transaction_pin'))){
+      if(!user.password || user.password === ''){
+        throw new HttpException('Password is required for this action', HttpStatus.UNAUTHORIZED);
+      }
+
+      if (!await bcrypt.compare(user.password, request.user.password)) {
+        throw new HttpException('Password is incorrect pls review password to complete this action', HttpStatus.UNAUTHORIZED);
+      }
+
+     delete user['password'];
+    }
+
+    const response = await this.userModel.findByIdAndUpdate(request.user._id, user, { new: true }).exec()
     return { 'response': response, 'status': HttpStatus.OK }
   }
 
