@@ -58,7 +58,7 @@ import { isAuthenticated } from "./middlewares/app.middleware";
     JwtModule.register({
       global: true,
       secret:secret,
-      signOptions: { expiresIn: '2h' },
+      signOptions: { expiresIn: '24h' },
     }),
     MulterModule.register({
       storage: diskStorage({

@@ -108,6 +108,13 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('/user/profile')
+  async GetUserProfile(@Res() response, @Req() request){
+    return response.status(200).json(request.user)
+  }
+
+
+  @UseGuards(AuthGuard)
   @Put('/user/update-profile')
   async UpdateProfile(@Res() response, @Req() request, @Body() user: UserDto){
     const data = await this.authService.updateUser(user, request);

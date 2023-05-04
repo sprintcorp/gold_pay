@@ -51,6 +51,9 @@ export class User {
     @Prop({length:6})
     transaction_pin: number
 
+    @Prop({default:0})
+    balance:number
+
     @Prop({default:false})
     active: boolean
 
