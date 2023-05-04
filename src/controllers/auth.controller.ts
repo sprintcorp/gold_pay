@@ -108,7 +108,7 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/user/update-profile')
+  @Put('/user/update-profile')
   async UpdateProfile(@Res() response, @Req() request, @Body() user: UserDto){
     const data = await this.authService.updateUser(user, request);
     return response.status(data.status).json(data.response)
