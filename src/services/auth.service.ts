@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { OnEvent } from "@nestjs/event-emitter";
 import { AuthDto } from "../dto/auth.dto";
 import { Helper } from "../utils/helper";
+import { AuthResponse } from "../transformers/auth.response";
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,7 @@ export class AuthService {
   }
 
   @OnEvent('verify_mail')
-  async signup(user: AuthDto, @Res() response): Promise<any> {
+  async signup(user: AuthDto, @Res() response): Promise<AuthResponse> {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
     const reqBody = {
@@ -127,6 +128,11 @@ export class AuthService {
     }
 
     return {'response':"User does not exit within the system", 'status':HttpStatus.NOT_FOUND}
+  }
+
+  async updateUser(user, request): Promise<any>{
+    const response = await this.userModel.findByIdAndUpdate(request.user._id, user)
+    return { 'response': response, 'status': HttpStatus.OK }
   }
 
   async getOne(email): Promise<User> {

@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsOptional, MaxLength, MinLength } from "class-validator";
 import { Exclude, Expose } from "class-transformer";
 
-export class AuthDto{
+export class UserDto{
 
   @MaxLength(50)
   @MinLength(0)
@@ -13,16 +13,16 @@ export class AuthDto{
   @IsOptional()
   public lastname: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(20)
   @MinLength(4)
   public username: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   public email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(6)
   public password: string;
 
@@ -33,19 +33,16 @@ export class AuthDto{
   @IsOptional()
   public referral_code: string;
 
-  public otp: number;
-
+  @IsOptional()
+  @MaxLength(6)
+  @MinLength(6)
   public login_pin: number;
 
+  @IsOptional()
+  @MaxLength(6)
+  @MinLength(6)
   public transaction_pin: number;
 
-  public active: boolean;
-
-  public createdDate: Date;
-
-  @Expose()
-  get fullName(): string {
-    return `${this.firstname} ${this.lastname}`;
-  }
+  public updatedDate: Date;
 
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 import { join } from "path/posix";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "./models/user.schema";
@@ -14,6 +14,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ConfigModule } from '@nestjs/config';
+import { isAuthenticated } from "./middlewares/app.middleware";
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { ConfigModule } from '@nestjs/config';
       rootPath: join(__dirname, '..', 'public'),
     }),
     JwtModule.register({
-      secret,
+      global: true,
+      secret:secret,
       signOptions: { expiresIn: '2h' },
     }),
     MulterModule.register({
@@ -71,4 +73,13 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [ AuthController],
   providers: [AuthService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(isAuthenticated)
+      .exclude(
+        { path: 'api/v1/user/update-profile', method: RequestMethod.GET }
+      )
+      .forRoutes(AuthController);
+  }
+}

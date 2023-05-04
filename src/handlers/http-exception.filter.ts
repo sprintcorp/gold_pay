@@ -20,7 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         : HttpStatus.EXPECTATION_FAILED;
 
     /**
-     * @description Exception json response
+     * @description Exception json transformers
      * @param message
      */
     const responseMessage = (type, message, statusCode= status) => {
