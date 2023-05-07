@@ -18,15 +18,16 @@ export class SubscriptionController {
   }
 
 
-  @Get("/user/subscription-webhook")
+  @Post("/user/subscription-webhook")
   async subscriptionWebhook (@Res() response, @Req() request) {
+
     await this.mailService.sendMail({
       to:'sprintcorp7@gmail.com',
       from:"no-reply@goldpay.com",
       subject: 'Account verification',
       template:'registration-email',
       context: {
-        data:'Webhook Test'
+        data:response
       }
     });
    return "sent";
