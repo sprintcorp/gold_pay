@@ -3,6 +3,7 @@ import { SubscriptionService } from "../services/subscription.service";
 import { MailerService } from "@nestjs-modules/mailer";
 import { SubscriptionDto } from "../dto/subscription.dto";
 import { AuthGuard } from "../guards/auth.guard";
+import { response } from "express";
 
 @Controller('/api/v1/')
 export class SubscriptionController {
@@ -11,12 +12,19 @@ export class SubscriptionController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/user/subscriptions')
+  @Post('/user/subscription')
   async subscribeToService(@Res() response, @Req() request, @Body() subscription: SubscriptionDto){
     const data = await this.subscriptionService.serviceSubscription(subscription, request)
     return response.status(200).json(data);
   }
 
+
+  @UseGuards(AuthGuard)
+  @Get('user/subscriptions')
+  async getUserSubscriptions(@Res() response, @Req() request){
+    const data = await this.subscriptionService.getSubscriptions(request);
+    return response.status(200).json(data);
+  }
 
   @Get("/user/subscription-webhook")
   async subscriptionWebhook (@Res() response, @Req() request) {

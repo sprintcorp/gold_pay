@@ -12,7 +12,12 @@ export class SubscriptionDto {
   @IsNotEmpty()
   network: string;
 
-  @IsNotEmpty()
+  @IsOptional()
+  subPackage: string;
+
+  @IsOptional()
+  smartCard: string;
+
   user: User
 
   @IsOptional()
@@ -25,4 +30,6 @@ export class SubscriptionDto {
   @MaxLength(6)
   @MinLength(6)
   transactionPin: string;
+
+  transactionId:string;
 }

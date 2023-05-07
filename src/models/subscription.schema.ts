@@ -14,6 +14,12 @@ export class Subscription{
   @Prop()
   network: string;
 
+  @Prop()
+  subPackage: string;
+
+  @Prop()
+  smartCard: string;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User" })
   user: User
 

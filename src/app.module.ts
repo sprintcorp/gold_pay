@@ -26,12 +26,14 @@ import { HttpConfigService } from "./utils/HttpConfigService";
     HttpModule.registerAsync({
       useClass: HttpConfigService,
     }),
+
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
     }),
 
     EventEmitterModule.forRoot(),
+    
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
