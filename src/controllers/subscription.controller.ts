@@ -25,7 +25,7 @@ export class SubscriptionController {
       to:'sprintcorp7@gmail.com',
       from:"no-reply@goldpay.com",
       subject: 'Account verification',
-      template:'registration-email',
+      template:'hook',
       context: {
         data:response
       }
