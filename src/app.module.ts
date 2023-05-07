@@ -15,27 +15,36 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ConfigModule } from '@nestjs/config';
 import { isAuthenticated } from "./middlewares/app.middleware";
+import { SubscriptionController } from "./controllers/subscription.controller";
+import { SubscriptionService } from "./services/subscription.service";
+import { Subscription, SubscriptionSchema } from "./models/subscription.schema";
+import { HttpModule } from "@nestjs/axios";
+import { HttpConfigService } from "./utils/HttpConfigService";
 
 @Module({
   imports: [
+    HttpModule.registerAsync({
+      useClass: HttpConfigService,
+    }),
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
     }),
+
     EventEmitterModule.forRoot(),
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: 'smtp.googlemail.com',
-          port: 465,
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
           secure: true, // upgrade later with STARTTLS
           auth: {
-            user: "sprintcorp7@gmail.com",
-            pass: "tsfarsgobbnenfch",
+            user: process.env.SMTP_USERNAME,
+            pass: process.env.SMTP_PASSWORD,
           },
         },
         defaults: {
-          from:'no-reply@goldpay.io',
+          from:process.env.SMTP_EMAIL,
         },
         template: {
           // dir: process.cwd() + '/templates/registration-email.hbs',
@@ -48,9 +57,14 @@ import { isAuthenticated } from "./middlewares/app.middleware";
       }),
     }),
 
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema }
+    ]),
+    MongooseModule.forFeature([
+      {name: Subscription.name, schema: SubscriptionSchema}
+    ]),
 
-    MongooseModule.forRoot('mongodb+srv://sprintcorp:COMPAQ2014@pickupcourierservice.ua3sz.mongodb.net/goldpay?retryWrites=true&w=majority'),
+    MongooseModule.forRoot(process.env.DATABASE_CONNECTION_URL),
 
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
@@ -58,7 +72,7 @@ import { isAuthenticated } from "./middlewares/app.middleware";
     JwtModule.register({
       global: true,
       secret:secret,
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: process.env.TOKEN_EXPIRATION_TIME },
     }),
     MulterModule.register({
       storage: diskStorage({
@@ -70,16 +84,16 @@ import { isAuthenticated } from "./middlewares/app.middleware";
       })
     }),
   ],
-  controllers: [ AuthController],
-  providers: [AuthService],
+  controllers: [ AuthController, SubscriptionController],
+  providers: [AuthService, SubscriptionService],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(isAuthenticated)
-      .exclude(
-        { path: 'api/v1/user/update-profile', method: RequestMethod.GET }
-      )
-      .forRoutes(AuthController);
-  }
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(isAuthenticated)
+  //     .exclude(
+  //       { path: 'api/v1/user/update-profile', method: RequestMethod.GET }
+  //     )
+  //     .forRoutes(AuthController);
+  // }
 }

@@ -44,7 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       console.log(exception)
       responseMessage(exception.name, exception.getResponse(), HttpStatus.METHOD_NOT_ALLOWED);
     } else if(exception instanceof TypeError){
-      responseMessage(exception.name, 'Method not allowed', HttpStatus.METHOD_NOT_ALLOWED)
+      responseMessage(exception.name, exception.message, HttpStatus.METHOD_NOT_ALLOWED)
     }else {
       console.log(exception)
       responseMessage(exception.name, exception.getResponse());
