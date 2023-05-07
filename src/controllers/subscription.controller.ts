@@ -18,7 +18,7 @@ export class SubscriptionController {
   }
 
 
-  @Post("/user/subscription-webhook")
+  @Get("/user/subscription-webhook")
   async subscriptionWebhook (@Res() response, @Req() request) {
 
     await this.mailService.sendMail({
