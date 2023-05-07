@@ -20,12 +20,12 @@ export class SubscriptionController {
 
   @Get("/user/subscription-webhook")
   async subscriptionWebhook (@Res() response, @Req() request) {
-    var responses = await this.mailService.sendMail({
+    await this.mailService.sendMail({
     to:'sprintcorp7@gmail.com',
     from:"nani.bommidi93@gmail.com",
     subject: 'Plain Text Email ✔',
     text: 'Webhook Test', 
    });
-   return responses;
+   return "sent";
  }
 }
