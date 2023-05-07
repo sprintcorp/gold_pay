@@ -21,11 +21,14 @@ export class SubscriptionController {
   @Get("/user/subscription-webhook")
   async subscriptionWebhook (@Res() response, @Req() request) {
     await this.mailService.sendMail({
-    to:'sprintcorp7@gmail.com',
-    from:"nani.bommidi93@gmail.com",
-    subject: 'Plain Text Email ✔',
-    text: 'Webhook Test', 
-   });
+      to:'sprintcorp7@gmail.com',
+      from:"no-reply@goldpay.com",
+      subject: 'Account verification',
+      template:'registration-email',
+      context: {
+        data:'Webhook Test'
+      }
+    });
    return "sent";
  }
 }
