@@ -54,9 +54,9 @@ export class AuthController {
   }
 
   @Post('/auth/signin')
-  async SignIn(@Res() response, @Body() request) {
+  async SignIn(@Res() response, @Body() request){
     const data = await this.authService.signin(request, this.jwtService);
-    return response.status(data.status).json({'data':data.response})
+    return response.status(data.status).json({'token':data.token, 'user':data.user})
   }
 
   @Post('/auth/verify')

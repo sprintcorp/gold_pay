@@ -38,9 +38,9 @@ export class AuthService {
 
   async signin(user, jwt: JwtService): Promise<any> {
 
-    let foundUser = await this.userModel.findOne({ email: user.email,active:true }).exec();
+    let foundUser = await this.userModel.findOne({ email: user.email, active:true }).exec();
     if(user.username && user.username !== ''){
-      foundUser = await this.userModel.findOne({ username: user.username,active:true }).exec();
+      foundUser = await this.userModel.findOne({ username: user.username, active:true }).exec();
     }
 
     if (foundUser) {
@@ -48,7 +48,8 @@ export class AuthService {
       if (await bcrypt.compare(user.password, password)) {
         const payload = { email: foundUser.email };
         return {
-          'response': jwt.sign(payload),
+          'token': jwt.sign(payload),
+          'user':foundUser,
           'status':HttpStatus.OK
         };
       }
@@ -58,7 +59,7 @@ export class AuthService {
   }
 
   async activateAccount(user: User): Promise<any> {
-    const foundUser = await this.userModel.findOne({ email: user.email,active:false }).exec();
+    const foundUser = await this.userModel.findOne({ email: user.email, active:false }).exec();
 
     if(foundUser){
       if(foundUser.otp === user.otp){
@@ -73,9 +74,12 @@ export class AuthService {
   }
 
   async sendVerificationOTP(user: User): Promise<any>{
-    let foundUser = await this.userModel.findOne({ email: user.email,active:false }).exec();
+    let foundUser = await this.userModel.findOne({ email: user.email, active:false }).exec();
+
+    console.log(foundUser)
+
     if(user.username && user.username !== ''){
-      foundUser = await this.userModel.findOne({ username: user.username,active:false }).exec();
+      foundUser = await this.userModel.findOne({ username: user.username, active:false }).exec();
     }
     if(foundUser){
         const otp = Math.floor(100000 + Math.random() * 900000);
@@ -87,9 +91,10 @@ export class AuthService {
   }
 
   async sendPasswordOTP(user: User): Promise<any>{
-    let foundUser = await this.userModel.findOne({ email: user.email,active:true }).exec();
+    let foundUser = await this.userModel.findOne({ email: user.email, active:true }).exec();
+    console.log(foundUser);
     if(user.username && user.username !== ''){
-      foundUser = await this.userModel.findOne({ username: user.username,active:true }).exec();
+      foundUser = await this.userModel.findOne({ username: user.username, active:true }).exec();
     }
     if(foundUser){
       const otp = Math.floor(100000 + Math.random() * 900000);
@@ -101,14 +106,14 @@ export class AuthService {
   }
 
   async resetPassword(user): Promise<any>{
-    let foundUser = await this.userModel.findOne({ email: user.email,otp:user.otp }).exec();
+    let foundUser = await this.userModel.findOne({ email: user.email, otp:user.otp }).exec();
 
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
 
     if(foundUser){
       const otp = Math.floor(100000 + Math.random() * 900000);
-      await this.userModel.findByIdAndUpdate(foundUser._id, {password:hash},{ new: true });
+      await this.userModel.findByIdAndUpdate(foundUser._id, {password:hash}, { new: true });
       return {'response':"Password reset successfully", 'status':HttpStatus.OK}
     }else{
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
