@@ -9,10 +9,11 @@ import { AuthDto } from "../dto/auth.dto";
 import { Helper } from "../utils/helper";
 import { AuthResponse } from "../transformers/auth.response";
 import { response } from "express";
+import { MailerService } from "@nestjs-modules/mailer";
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>,
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>
   ) {
   }
 
@@ -43,6 +44,7 @@ export class AuthService {
       foundUser = await this.userModel.findOne({ username: user.username, active:true }).exec();
     }
 
+
     if (foundUser) {
       const { password } = foundUser;
       if (await bcrypt.compare(user.password, password)) {
@@ -53,9 +55,9 @@ export class AuthService {
           'status':HttpStatus.OK
         };
       }
-      return {'response':"Incorrect username or password", 'status':HttpStatus.UNAUTHORIZED}
+      throw new HttpException("Incorrect username or password", HttpStatus.UNAUTHORIZED)
     }
-    return {'response':"User does not exit within the system", 'status':HttpStatus.NOT_FOUND}
+    throw new HttpException("Account not verified or does not exit within the system", HttpStatus.NOT_FOUND)
   }
 
   async activateAccount(user: User): Promise<any> {
