@@ -21,6 +21,7 @@ import {MailEvent} from "../events/mail.event";
 import { AuthDto } from "../dto/auth.dto";
 import { AuthGuard } from "../guards/auth.guard";
 import { UserDto } from "../dto/user.dto";
+import { TokenDto } from "src/dto/token.dto";
 
 
 @Controller('/api/v1/')
@@ -118,6 +119,13 @@ export class AuthController {
   @Put('/user/update-profile')
   async UpdateProfile(@Res() response, @Req() request, @Body() user: UserDto){
     const data = await this.authService.updateUser(user, request);
+    return response.status(data.status).json(data.response)
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/user/token-transfer')
+  async TransferToken(@Res() response, @Req() request, @Body() user: TokenDto){
+    const data = await this.authService.transferToken(user, request);
     return response.status(data.status).json(data.response)
   }
 }

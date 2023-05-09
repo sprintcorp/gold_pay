@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus, Res } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import mongoose, { Model } from "mongoose";
 import { User, UserDocument } from "../models/user.schema";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -13,7 +13,8 @@ import { MailerService } from "@nestjs-modules/mailer";
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>, 
+  @InjectConnection() private readonly connection: mongoose.Connection,
   ) {
   }
 
@@ -39,10 +40,12 @@ export class AuthService {
 
   async signin(user, jwt: JwtService): Promise<any> {
 
-    let foundUser = await this.userModel.findOne({ email: user.email, active:true }).exec();
-    if(user.username && user.username !== ''){
-      foundUser = await this.userModel.findOne({ username: user.username, active:true }).exec();
-    }
+    // let foundUser = await this.userModel.findOne({ email: user.email, active:true }).exec();
+    // if(user.username && user.username !== ''){
+    //   foundUser = await this.userModel.findOne({ username: user.username, active:true }).exec();
+    // }
+
+    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.email}, {username: user.username}], active:true}]}).exec();
 
 
     if (foundUser) {
@@ -76,13 +79,16 @@ export class AuthService {
   }
 
   async sendVerificationOTP(user: User): Promise<any>{
-    let foundUser = await this.userModel.findOne({ email: user.email, active:false }).exec();
+    // let foundUser = await this.userModel.findOne({ email: user.email, active:false }).exec();
 
-    console.log(foundUser)
+    
 
-    if(user.username && user.username !== ''){
-      foundUser = await this.userModel.findOne({ username: user.username, active:false }).exec();
-    }
+    // if(user.username && user.username !== ''){
+    //   foundUser = await this.userModel.findOne({ username: user.username, active:false }).exec();
+    // }
+
+    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.email}, {username: user.username}], active:true}]}).exec();
+
     if(foundUser){
         const otp = Math.floor(100000 + Math.random() * 900000);
         await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)}, { new: true });
@@ -164,6 +170,51 @@ export class AuthService {
 
     const response = await this.userModel.findByIdAndUpdate(request.user._id, user, { new: true }).exec()
     return { 'response': response, 'status': HttpStatus.OK }
+  }
+
+
+  async transferToken(user, request){
+    if(request.user.transaction_pin != user.transactionPin){
+      throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
+    }
+
+    // if(request.user.balance== 0 || request.user.balance < user.amount){
+    //   throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
+    // }
+
+    const receiver = await this.userModel.findOne({$or:[{email:user.user}, 
+      {username: user.user}]}).exec();
+
+      if(!receiver){
+        throw new HttpException('User does not exist', HttpStatus.NOT_FOUND)
+      }
+
+
+    const session = await this.connection.startSession();
+ 
+    session.startTransaction();
+
+    try {
+
+    
+      const sender_balance = request.user.balance - parseInt(user.amount);
+
+      const receiver_balance = receiver.balance + parseInt(user.amount);
+
+      await this.userModel.findByIdAndUpdate(request.user._id,
+        {balance: sender_balance},{ new: true }).exec()
+
+      await this.userModel.findByIdAndUpdate(receiver._id,
+        {balance: receiver_balance},{ new: true }).exec()
+
+      await session.commitTransaction();
+      
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    }
+    session.endSession();
+    return { 'response': `Token tranferred to ${user.user} successfully`, 'status': HttpStatus.OK };
   }
 
   async getOne(email): Promise<User> {

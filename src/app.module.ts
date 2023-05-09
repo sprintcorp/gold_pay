@@ -20,9 +20,12 @@ import { SubscriptionService } from "./services/subscription.service";
 import { Subscription, SubscriptionSchema } from "./models/subscription.schema";
 import { HttpModule } from "@nestjs/axios";
 import { HttpConfigService } from "./utils/HttpConfigService";
+import { AuthModule } from "./modules/auth.module";
+import { GetUserTokenData } from "./utils/GetUserTokenData";
 
 @Module({
   imports: [
+    AuthModule,
     HttpModule.registerAsync({
       useClass: HttpConfigService,
     }),
@@ -87,7 +90,7 @@ import { HttpConfigService } from "./utils/HttpConfigService";
     }),
   ],
   controllers: [ AuthController, SubscriptionController],
-  providers: [AuthService, SubscriptionService],
+  providers: [AuthService, SubscriptionService, GetUserTokenData],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {

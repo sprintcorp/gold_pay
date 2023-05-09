@@ -19,7 +19,7 @@ export class SubscriptionService{
       throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
     }
 
-    if(request.user.balance== 0 && request.user.balance < subscription.amount){
+    if(request.user.balance== 0 || request.user.balance < subscription.amount){
       throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
     }
 

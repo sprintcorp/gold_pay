@@ -33,14 +33,19 @@ export class User {
     // @MinLength(6)
     password: string
 
-    @Prop({length:8, default: Helper.uniqueRandomNumber(8, )})
+    @Prop({length:8, default: Helper.uniqueRandomNumber(8)})
     user_referral_code: string
 
-    @Prop({length:8})
+    @Prop({length:8, ref: "User"})
     // @MaxLength(8)
     // @MinLength(8)
     // @IsOptional()
     referral_code: string
+    @Prop()
+    address: string
+
+    @Prop()
+    private_key: string
 
     @Prop({length:6, default: Math.floor(100000 + Math.random() * 900000)})
     otp: number

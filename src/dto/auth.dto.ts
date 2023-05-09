@@ -35,6 +35,10 @@ export class AuthDto{
 
   public otp: number;
 
+  public address: string
+
+  public private_key: string
+
   public login_pin: number;
 
   public transaction_pin: number;
