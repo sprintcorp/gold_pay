@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { OnEvent } from "@nestjs/event-emitter";
 import { AuthDto } from "../dto/auth.dto";
 import { Helper } from "../utils/helper";
-import { AuthResponse } from "../transformers/auth.response";
+import { UserEntity } from "../transformers/auth.response";
 import { response } from "express";
 import { MailerService } from "@nestjs-modules/mailer";
 
@@ -19,9 +19,16 @@ export class AuthService {
   }
 
   @OnEvent('verify_mail')
-  async signup(user: AuthDto, @Res() response): Promise<AuthResponse> {
+  async signup(user: AuthDto, @Res() response) {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
+
+    const usernameExist = await this.userModel.findOne({username: user.username}).exec()
+
+    if(usernameExist){
+      throw new HttpException("Username already exist", 422)
+    }
+
     const reqBody = {
       referral_code: user.referral_code,
       email: user.email,
@@ -31,8 +38,8 @@ export class AuthService {
       password: hash
     }
     // try{
-    const newUser = new this.userModel(reqBody);
-    return newUser.save()
+    const newUser = new this.userModel(reqBody).save();
+    return newUser;
     // }catch (e) {
     //   console.log('hellooooo '+ e.getMessage());
     // }
@@ -45,7 +52,7 @@ export class AuthService {
     //   foundUser = await this.userModel.findOne({ username: user.username, active:true }).exec();
     // }
 
-    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.email}, {username: user.username}], active:true}]}).exec();
+    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.username}, {username: user.username}], active:true}]}).exec();
 
 
     if (foundUser) {

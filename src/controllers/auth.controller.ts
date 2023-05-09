@@ -10,7 +10,9 @@ import {
   Put,
   Req,
   Res,
-  UseGuards
+  UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor
 } from "@nestjs/common";
 import { User } from "../models/user.schema";
 import { AuthService } from "../services/auth.service";
@@ -22,6 +24,7 @@ import { AuthDto } from "../dto/auth.dto";
 import { AuthGuard } from "../guards/auth.guard";
 import { UserDto } from "../dto/user.dto";
 import { TokenDto } from "src/dto/token.dto";
+import { UserEntity } from "src/transformers/auth.response";
 
 
 @Controller('/api/v1/')
@@ -34,7 +37,8 @@ export class AuthController {
   }
 
   @Post('/auth/signup')
-  async Signup(@Res() response, @Body() user: AuthDto) {
+  // @UseInterceptors(ClassSerializerInterceptor)
+  async Signup(@Res() response, @Body() user: AuthDto): Promise<UserEntity> {
 
     const newUser = await this.authService.signup(user, response);
 
