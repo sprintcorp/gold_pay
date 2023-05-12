@@ -25,6 +25,9 @@ import { AuthGuard } from "../guards/auth.guard";
 import { UserDto } from "../dto/user.dto";
 import { TokenDto } from "src/dto/token.dto";
 import { UserEntity } from "src/transformers/auth.response";
+import { UserInterface } from "src/interfaces/user.interface";
+import { CustomInterceptors } from "src/interceptors/custom.interceptor";
+import { UserResources } from "src/resources/user.resources";
 
 
 @Controller('/api/v1/')
@@ -32,30 +35,33 @@ export class AuthController {
   constructor(private readonly authService: AuthService,
               private jwtService: JwtService,
               private mailService: MailerService,
+              private readonly userResources: UserResources
               // private eventEmitter: EventEmitterModule
   ) {
   }
 
   @Post('/auth/signup')
-  // @UseInterceptors(ClassSerializerInterceptor)
-  async Signup(@Res() response, @Body() user: AuthDto): Promise<UserEntity> {
+  async Signup(@Res() response, @Body() user: AuthDto):Promise<UserEntity> {
 
     const newUser = await this.authService.signup(user, response);
 
-      const otp = newUser.otp;
-      await this.mailService.sendMail({
-        to:user.email,
-        from:"no-reply@goldpay.com",
-        subject: 'Account verification',
-        template:'registration-email',
-        context: {
-          data:otp
-        }
-      });
+    const otp = newUser.otp;
+
+    await this.mailService.sendMail({
+      to:user.email,
+      from:"no-reply@goldpay.com",
+      subject: 'Account verification',
+      template:'registration-email',
+      context: {
+        data:otp
+      }
+    });
+
+    const userProfile = this.userResources.response(newUser);
 
     return response.status(HttpStatus.CREATED).json({
-      newUser
-    })
+      userProfile
+    });
   }
 
   @Post('/auth/signin')
@@ -114,8 +120,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('/user/profile')
-  async GetUserProfile(@Res() response, @Req() request){
-    return response.status(200).json(request.user)
+  async GetUserProfile(@Res() response, @Req() request): Promise<User>{
+    const userProfile = this.userResources.response(request.user)
+    return response.status(200).json(userProfile)
   }
 
 
@@ -123,7 +130,8 @@ export class AuthController {
   @Put('/user/update-profile')
   async UpdateProfile(@Res() response, @Req() request, @Body() user: UserDto){
     const data = await this.authService.updateUser(user, request);
-    return response.status(data.status).json(data.response)
+    const userProfile = this.userResources.response(data.response);
+    return response.status(data.status).json(userProfile);
   }
 
   @UseGuards(AuthGuard)

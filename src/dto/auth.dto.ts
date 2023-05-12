@@ -37,6 +37,7 @@ export class AuthDto{
 
   public address: string
 
+  @Exclude()
   public private_key: string
 
   public login_pin: number;
@@ -47,9 +48,9 @@ export class AuthDto{
 
   public createdDate: Date;
 
-  @Expose()
-  get fullName(): string {
-    return `${this.firstname} ${this.lastname}`;
-  }
+  // @Expose()
+  // get fullName(): string {
+  //   return `${this.firstname} ${this.lastname}`;
+  // }
 
 }

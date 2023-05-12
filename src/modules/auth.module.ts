@@ -5,9 +5,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/models/user.schema';
 import { GetUserTokenData } from 'src/utils/GetUserTokenData';
 import { HttpService as http } from "@nestjs/axios";
+import { UserResources } from 'src/resources/user.resources';
 
 @Module({
-  providers: [AuthService],
+  providers: [AuthService, UserResources],
   controllers: [AuthController],
 
   imports: [

@@ -10,23 +10,26 @@ import { Helper } from "../utils/helper";
 import { UserEntity } from "../transformers/auth.response";
 import { response } from "express";
 import { MailerService } from "@nestjs-modules/mailer";
+import { UserInterface } from "src/interfaces/user.interface";
+import { UserResources } from "src/resources/user.resources";
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>, 
-  @InjectConnection() private readonly connection: mongoose.Connection,
+  constructor(@InjectModel(User.name) private userModel: Model<UserEntity>, 
+  @InjectConnection() private readonly connection: mongoose.Connection, 
+  private readonly userResources: UserResources
   ) {
   }
 
   @OnEvent('verify_mail')
-  async signup(user: AuthDto, @Res() response) {
+  async signup(user: AuthDto, @Res() response):Promise<UserEntity>{
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
 
     const usernameExist = await this.userModel.findOne({username: user.username}).exec()
 
     if(usernameExist){
-      throw new HttpException("Username already exist", 422)
+      throw new HttpException("Username already exist", 422);
     }
 
     const reqBody = {
@@ -54,15 +57,14 @@ export class AuthService {
 
     const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.username}, {username: user.username}], active:true}]}).exec();
 
-
     if (foundUser) {
       const { password } = foundUser;
       if (await bcrypt.compare(user.password, password)) {
         const payload = { email: foundUser.email };
         return {
           'token': jwt.sign(payload),
-          'user':foundUser,
-          'status':HttpStatus.OK
+          'user': this.userResources.response(foundUser),
+          'status': HttpStatus.OK
         };
       }
       throw new HttpException("Incorrect username or password", HttpStatus.UNAUTHORIZED)
@@ -224,7 +226,7 @@ export class AuthService {
     return { 'response': `Token tranferred to ${user.user} successfully`, 'status': HttpStatus.OK };
   }
 
-  async getOne(email): Promise<User> {
+  async getOne(email): Promise<UserEntity> {
     return await this.userModel.findOne({ email }).exec();
   }
 

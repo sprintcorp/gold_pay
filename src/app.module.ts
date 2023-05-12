@@ -22,10 +22,13 @@ import { HttpModule } from "@nestjs/axios";
 import { HttpConfigService } from "./utils/HttpConfigService";
 import { AuthModule } from "./modules/auth.module";
 import { GetUserTokenData } from "./utils/GetUserTokenData";
+import { UserResources } from "./resources/user.resources";
+// import { SubscriptionModule } from "./modules/subscription.module";
 
 @Module({
   imports: [
     AuthModule,
+    // SubscriptionModule,
     HttpModule.registerAsync({
       useClass: HttpConfigService,
     }),
@@ -79,6 +82,7 @@ import { GetUserTokenData } from "./utils/GetUserTokenData";
       secret:secret,
       signOptions: { expiresIn: process.env.TOKEN_EXPIRATION_TIME },
     }),
+
     MulterModule.register({
       storage: diskStorage({
         destination: './public',
@@ -90,7 +94,7 @@ import { GetUserTokenData } from "./utils/GetUserTokenData";
     }),
   ],
   controllers: [ AuthController, SubscriptionController],
-  providers: [AuthService, SubscriptionService, GetUserTokenData],
+  providers: [AuthService, SubscriptionService, GetUserTokenData, UserResources],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {
