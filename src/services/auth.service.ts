@@ -127,14 +127,7 @@ export class AuthService {
   }
 
   async sendVerificationOTP(user: User): Promise<any>{
-    // let foundUser = await this.userModel.findOne({ email: user.email, active:false }).exec();
-
     
-
-    // if(user.username && user.username !== ''){
-    //   foundUser = await this.userModel.findOne({ username: user.username, active:false }).exec();
-    // }
-
     const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.email}, {username: user.username}], active:true}]}).exec();
 
     if(foundUser){
@@ -221,6 +214,16 @@ export class AuthService {
   }
 
 
+
+  async getUserByEmailUsername(username: string){
+    
+    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:username}, {username: username}], active:true}]});
+    if(!foundUser){
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+    return foundUser;
+  }
+
   async transferToken(user, request){
     if(request.user.transaction_pin != user.transactionPin){
       throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
@@ -246,7 +249,7 @@ export class AuthService {
 
     
       const sender_balance = request.user.balance - parseInt(user.amount);
-
+      
       const receiver_balance = receiver.balance + parseInt(user.amount);
 
       await this.userModel.findByIdAndUpdate(request.user._id,
