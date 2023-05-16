@@ -61,6 +61,12 @@ export class User {
     @Prop({default:0})
     balance:number
 
+    @Prop({default:0})
+    blockchain_balance:number
+
+    @Prop({default:0})
+    debit:number
+
     @Prop({default:false})
     active: boolean
 

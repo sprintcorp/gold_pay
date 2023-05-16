@@ -1,23 +1,16 @@
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
+import { OnEvent } from "@nestjs/event-emitter";
 import { User } from "../models/user.schema";
 
-@Injectable()
+// @Injectable()
 export class MailEvent{
-  constructor(private mailService: MailerService, private user: User){}
+  // constructor(private mailService: MailerService, private user: User){}
 
 
-  async notifyUser () {
-    await this.mailService.sendMail({
-      to:this.user.email,
-      from:"nani.bommidi93@gmail.com",
-      subject: 'Account verification',
-      template:'registration-email',
-      context: {
-        data:this.user
-      }
-
-    });
+  @OnEvent('notify_user')
+  async handleNotifyUser () {
+    console.log("event emmitted");
   }
 
 }

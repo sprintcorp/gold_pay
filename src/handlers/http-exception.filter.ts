@@ -6,6 +6,7 @@ import {
   HttpStatus,
   InternalServerErrorException, BadRequestException, MethodNotAllowedException, NotFoundException
 } from "@nestjs/common";
+import { AxiosError } from "axios";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -45,6 +46,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       responseMessage(exception.name, exception.getResponse(), HttpStatus.METHOD_NOT_ALLOWED);
     } else if(exception instanceof TypeError){
       responseMessage(exception.name, exception.message, HttpStatus.METHOD_NOT_ALLOWED)
+    } else if(exception instanceof AxiosError){
+      responseMessage('axios exception', exception, 503)
     }else {
       console.log(exception)
       responseMessage(exception.name, exception.getResponse());

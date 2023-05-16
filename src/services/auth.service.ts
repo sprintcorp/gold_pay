@@ -1,10 +1,10 @@
 import { Injectable, HttpException, HttpStatus, Res } from "@nestjs/common";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, ObjectId } from "mongoose";
 import { User, UserDocument } from "../models/user.schema";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { OnEvent } from "@nestjs/event-emitter";
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { AuthDto } from "../dto/auth.dto";
 import { Helper } from "../utils/helper";
 import { UserEntity } from "../transformers/auth.response";
@@ -12,16 +12,23 @@ import { response } from "express";
 import { MailerService } from "@nestjs-modules/mailer";
 import { UserInterface } from "src/interfaces/user.interface";
 import { UserResources } from "src/resources/user.resources";
+import { MailEvent } from "src/events/mail.event";
+import { HttpService as http } from "@nestjs/axios";
+import { GetUserTokenData } from "src/utils/GetUserTokenData";
+import { request } from "http";
+
 
 @Injectable()
 export class AuthService {
+  
   constructor(@InjectModel(User.name) private userModel: Model<UserEntity>, 
   @InjectConnection() private readonly connection: mongoose.Connection, 
-  private readonly userResources: UserResources
+  private readonly userResources: UserResources, 
+  private eventEmitter: EventEmitter2,
   ) {
   }
 
-  @OnEvent('verify_mail')
+  // @OnEvent('verify_mail')
   async signup(user: AuthDto, @Res() response):Promise<UserEntity>{
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
@@ -40,12 +47,44 @@ export class AuthService {
       username: user.username,
       password: hash
     }
+
+    // this.eventEmitter.emit('notify.user', new MailEvent());
+
     // try{
     const newUser = new this.userModel(reqBody).save();
+
+    const userData = await this.userModel.findOne({email: user.email}).exec();
+
     return newUser;
     // }catch (e) {
     //   console.log('hellooooo '+ e.getMessage());
     // }
+  }
+
+
+  async getUserAccountBalance(user:any){
+    try{
+      const httpReq = new http();
+      const tokenRes = new GetUserTokenData(httpReq);
+      const data = await tokenRes.getUserWalletBallance(user.user.address);
+
+      
+      const balance = data - user.user.debit ?? 0;
+      
+      const userData = await this.userModel.findByIdAndUpdate(user.user._id,{balance:balance,
+         blockchain_balance: data},{ new: true });
+         return userData;
+
+    }catch(e){
+      throw e;
+    }
+
+  }
+
+  async getUserDetails(userId: ObjectId)
+  {
+    const user = await this.userModel.findById(userId);
+    return user;
   }
 
   async signin(user, jwt: JwtService): Promise<any> {

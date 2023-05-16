@@ -18,7 +18,7 @@ import { User } from "../models/user.schema";
 import { AuthService } from "../services/auth.service";
 import { JwtService } from '@nestjs/jwt'
 import { MailerService } from "@nestjs-modules/mailer";
-// import { EventEmitterModule } from "@nestjs/event-emitter";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import {MailEvent} from "../events/mail.event";
 import { AuthDto } from "../dto/auth.dto";
 import { AuthGuard } from "../guards/auth.guard";
@@ -32,20 +32,25 @@ import { UserResources } from "src/resources/user.resources";
 
 @Controller('/api/v1/')
 export class AuthController {
+  
   constructor(private readonly authService: AuthService,
               private jwtService: JwtService,
               private mailService: MailerService,
-              private readonly userResources: UserResources
+              private readonly userResources: UserResources,
+              private eventEmitter: EventEmitter2
               // private eventEmitter: EventEmitterModule
   ) {
   }
 
   @Post('/auth/signup')
-  async Signup(@Res() response, @Body() user: AuthDto):Promise<UserEntity> {
+  async Signup(@Res() response, @Body() user: AuthDto):Promise<any> {
 
     const newUser = await this.authService.signup(user, response);
 
     const otp = newUser.otp;
+    
+
+    // this.eventEmitter.emit('notify_user', new MailEvent());
 
     await this.mailService.sendMail({
       to:user.email,
@@ -121,7 +126,8 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('/user/profile')
   async GetUserProfile(@Res() response, @Req() request): Promise<User>{
-    const userProfile = this.userResources.response(request.user)
+    const userData = await this.authService.getUserAccountBalance(request);
+    const userProfile = this.userResources.response(userData)
     return response.status(200).json(userProfile)
   }
 

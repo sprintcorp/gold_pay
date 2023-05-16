@@ -37,8 +37,11 @@ export class SubscriptionService{
 
     const newBalance = request.user.balance - subscription.amount;
 
+    const debitBalance = request.user.debit + subscription.amount;
+
     await new this.subscriptionModel(subscription).save();
-    await this.userModel.findByIdAndUpdate(request.user._id, {balance:newBalance}, { new: true });
+    await this.userModel.findByIdAndUpdate(request.user._id,
+       {balance:newBalance, debit:debitBalance}, { new: true });
     
     return response.data;
 
