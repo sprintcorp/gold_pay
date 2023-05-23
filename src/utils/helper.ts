@@ -17,3 +17,10 @@ export class Helper{
     return d.setMinutes(d.getMinutes() + time);
   }
 }
+
+export enum PaymentType {
+    DEPOSIT='deposit',
+    WITHDRAW='withdraw'
+}
+
+export const populateValue = 'firstname lastname balance blockchain_balance email accountNumber accountName bankName';

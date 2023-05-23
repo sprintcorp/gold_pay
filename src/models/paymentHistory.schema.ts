@@ -17,8 +17,11 @@ export class PaymentHistory{
   @Prop({default:"Pending"})
   status: string;
 
-  @Prop({default: Date.now() })
+  @Prop({default: Date.now()})
   createdDate: Date
+
+  @Prop()
+  updatedDate: Date
 }
 
 export const PaymentHistorySchema = SchemaFactory.createForClass(PaymentHistory);

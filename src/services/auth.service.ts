@@ -47,7 +47,7 @@ export class AuthService {
       username: user.username,
       password: hash
     }
-    
+
     const newUser = new this.userModel(reqBody).save();
 
     const userData = await this.userModel.findOne({email: user.email}).exec();
@@ -60,10 +60,11 @@ export class AuthService {
     try{
       const httpReq = new http();
       const tokenRes = new GetUserTokenData(httpReq);
-      const data = await tokenRes.getUserWalletBallance(user.user.address);
 
+      const data = user.user.address ? 
+      await tokenRes.getUserWalletBallance(user.user.address) : user.user.balance;
       
-      const balance = data - user.user.debit ?? 0;
+      const balance = data - user.user.debit;
       
       const userData = await this.userModel.findByIdAndUpdate(user.user._id,{balance:balance,
          blockchain_balance: data},{ new: true });

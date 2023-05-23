@@ -82,4 +82,12 @@ export class User {
     createdDate: Date
 
 }
+
 export const UserSchema = SchemaFactory.createForClass(User)
+
+UserSchema.virtual('user', {
+    ref: 'PaymentHistory',
+    localField: '_id',
+    foreignField: 'user',
+    justOne: false
+});

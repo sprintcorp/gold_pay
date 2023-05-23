@@ -1,18 +1,44 @@
-import { IsEnum, IsNotEmpty, MaxLength, MinLength } from "class-validator";
+import { IsEnum, IsNotEmpty, MaxLength, MinLength, NotEquals } from "class-validator";
 import { User } from "src/models/user.schema";
+import { PaymentType } from "src/utils/helper";
 
 export class PaymentDTO{
     @MaxLength(50)
     @MinLength(2)
     @IsNotEmpty()
-    amount: number;
+    public amount: number;
   
     @MaxLength(50)
-    @MinLength(2)
-    @IsEnum(['deposit','withdraw'])
+    @MinLength(7)
+    @IsEnum(PaymentType)
+    @NotEquals(PaymentType.WITHDRAW)
     @IsNotEmpty()
-    type: ['deposit','withdraw'];
+    public type: PaymentType;
 
-    user:User;
+    public user:User;
+
+  }
+
+  export class WithdrawDTO{
+    @MaxLength(50)
+    @MinLength(2)
+    @IsNotEmpty()
+    public amount: number;
+  
+    @MaxLength(50)
+    @MinLength(7)
+    @IsEnum(PaymentType)
+    @NotEquals(PaymentType.DEPOSIT)
+    @IsNotEmpty()
+    public type: PaymentType;
+
+    @MaxLength(6)
+    @MinLength(6)
+    @IsNotEmpty()
+    public transaction_pin: number;
+
+    public status: string;
+
+    public user:User;
 
   }

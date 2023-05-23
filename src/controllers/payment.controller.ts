@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Req, Res, UseGuards } from "@nestjs/common";
-import { PaymentDTO } from "src/dto/payment.dto";
+import { PaymentDTO, WithdrawDTO } from "src/dto/payment.dto";
 import { PaymentListDTO, PaymentListUpdateDTO } from "src/dto/paymentList.dto";
 import { PaymentService } from "src/services/payment.service";
 import { Roles } from "src/utils/roles.decorator";
@@ -18,6 +18,24 @@ export class PaymentController {
   async createPaymentList(@Res() res, @Req() req, @Body() paymentList: PaymentListDTO): Promise<any>{
       const data = await this.paymentService.createPaymentList(paymentList);
       return res.status(HttpStatus.CREATED).json(data);
+  }
+  
+  
+  @UseGuards(AuthGuard)
+  @Roles(UserRoles.ADMIN)
+  @Get('admin/payment-request')
+  async userPaymentRequest(@Res() res): Promise<any>{
+      const data = await this.paymentService.userPaymentRequest();
+      return res.status(HttpStatus.OK).json(data);
+  }
+  
+  
+  @UseGuards(AuthGuard)
+  @Roles(UserRoles.ADMIN)
+  @Get('admin/payment-request/:id')
+  async userPaymentRequestDetails(@Res() res, @Param('id') id): Promise<any>{
+      const data = await this.paymentService.userPaymentRequestDetails(id);
+      return res.status(HttpStatus.OK).json(data);
   }
 
   @UseGuards(AuthGuard)
@@ -59,11 +77,32 @@ export class PaymentController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('user/withdraw')
-  async p2pWithdraw(@Res() res, @Body() payment: PaymentDTO, @Req() request){
+  @Get('user/payment-requests-history')
+  async getUserPaymentRequest(@Res() res, @Req() request): Promise<any>{
+      const data = await this.paymentService.paymentHistory(request);
+      return res.status(HttpStatus.OK).json(data);
+  }
 
+  @UseGuards(AuthGuard)
+  @Put('user/payment-confrim/:id')
+  async confrimDeposit(@Res() res, @Param('id') id): Promise<any>{
+      const data = await this.paymentService.confrimPayment(id);
+      return res.status(HttpStatus.OK).json(data);
+  }
+
+  @UseGuards(AuthGuard)
+  @Roles(UserRoles.ADMIN)
+  @Put('admin/payment-confirm/:id')
+  async adminConfrimDeposit(@Res() res, @Param('id') id): Promise<any>{
+      const data = await this.paymentService.adminConfirmPayment(id);
+      return res.status(HttpStatus.OK).json(data);
   }
 
 
-
+  @UseGuards(AuthGuard)
+  @Post('user/withdraw')
+  async p2pWithdraw(@Res() res, @Body() payment: WithdrawDTO, @Req() request){
+    const data = await this.paymentService.withdrawRequest(payment, request);
+    return res.status(HttpStatus.OK).json(data);
+  }
 }

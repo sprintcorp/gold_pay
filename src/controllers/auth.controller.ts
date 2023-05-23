@@ -49,9 +49,6 @@ export class AuthController {
 
     const otp = newUser.otp;
     
-
-    // this.eventEmitter.emit('notify_user', new MailEvent());
-
     await this.mailService.sendMail({
       to:user.email,
       from:"no-reply@goldpay.com",
