@@ -7,11 +7,6 @@ import { SubscriptionService } from 'src/services/subscription.service';
 @Module({
   providers: [SubscriptionService],
   controllers: [SubscriptionController],
-  // imports: [
-    // MongooseModule.forFeature([
-    //   {name: Subscription.name, schema: SubscriptionSchema}
-    // ]),
-  // ]
 })
 export class SubscriptionModule {
   

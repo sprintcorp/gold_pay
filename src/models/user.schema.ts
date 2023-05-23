@@ -9,20 +9,16 @@ import { Exclude } from "class-transformer";
 export class User {
     
     @Prop()
-    // @MaxLength(50)
-    // @MinLength(0)
-    // @IsOptional()
     firstname: string;
 
     @Prop()
-    // @MaxLength(50)
-    // @MinLength(0)
-    // @IsOptional()
     lastname: string;
 
     @Prop({required:true, unique:true, lowercase:true})
-    // @IsEmail()
     email: string;
+
+    @Prop({default:'user'})
+    role: string;
 
     @Prop({required:true, unique:true, lowercase:true})
     // @MaxLength(50)
@@ -66,6 +62,15 @@ export class User {
 
     @Prop({default:0})
     debit:number
+
+    @Prop()
+    accountNumber:number
+
+    @Prop()
+    accountName:string
+
+    @Prop()
+    bankName:string
 
     @Prop({default:false})
     active: boolean

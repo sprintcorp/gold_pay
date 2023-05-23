@@ -8,9 +8,6 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(new ValidationPipe({whitelist: true}));
-  // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  console.log(parseInt(process.env.PORT, 10));
   await app.listen(parseInt(process.env.PORT, 10) || 3000);
-
 }
 bootstrap();

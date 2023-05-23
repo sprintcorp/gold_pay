@@ -51,6 +51,17 @@ export class UserDto{
   @MinLength(6)
   public transaction_pin: number;
 
+  @IsOptional()
+  @MaxLength(10)
+  @MinLength(10)
+  public accountNumber:number
+
+  @IsOptional()
+  public  accountName:string
+
+  @IsOptional()
+  public bankName:string
+
   public updatedDate: Date;
 
 }

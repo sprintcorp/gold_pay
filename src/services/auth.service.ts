@@ -47,18 +47,12 @@ export class AuthService {
       username: user.username,
       password: hash
     }
-
-    // this.eventEmitter.emit('notify.user', new MailEvent());
-
-    // try{
+    
     const newUser = new this.userModel(reqBody).save();
 
     const userData = await this.userModel.findOne({email: user.email}).exec();
 
     return newUser;
-    // }catch (e) {
-    //   console.log('hellooooo '+ e.getMessage());
-    // }
   }
 
 

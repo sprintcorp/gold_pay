@@ -23,6 +23,12 @@ import { HttpConfigService } from "./utils/HttpConfigService";
 import { AuthModule } from "./modules/auth.module";
 import { GetUserTokenData } from "./utils/GetUserTokenData";
 import { UserResources } from "./resources/user.resources";
+import { PaymentList, PaymentListSchema } from "./models/paymentList.schema";
+import { PaymentHistory, PaymentHistorySchema } from "./models/paymentHistory.schema";
+import { PaymentService } from "./services/payment.service";
+import { PaymentController } from "./controllers/payment.controller";
+import { APP_GUARD } from "@nestjs/core";
+import { RolesGuard } from "./utils/roles.guard";
 // import { SubscriptionModule } from "./modules/subscription.module";
 
 @Module({
@@ -71,6 +77,12 @@ import { UserResources } from "./resources/user.resources";
     MongooseModule.forFeature([
       {name: Subscription.name, schema: SubscriptionSchema}
     ]),
+    MongooseModule.forFeature([
+      {name: PaymentList.name, schema: PaymentListSchema}
+    ]),
+    MongooseModule.forFeature([
+      {name: PaymentHistory.name, schema: PaymentHistorySchema}
+    ]),
 
     MongooseModule.forRoot(process.env.DATABASE_CONNECTION_URL),
 
@@ -93,8 +105,12 @@ import { UserResources } from "./resources/user.resources";
       })
     }),
   ],
-  controllers: [ AuthController, SubscriptionController],
-  providers: [AuthService, SubscriptionService, GetUserTokenData, UserResources],
+  controllers: [SubscriptionController, PaymentController],
+  providers: [AuthService, SubscriptionService, GetUserTokenData, UserResources, PaymentService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {

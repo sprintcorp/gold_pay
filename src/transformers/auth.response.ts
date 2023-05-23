@@ -14,8 +14,11 @@ export interface UserEntity extends Document{
   readonly otp: number;
   readonly balance: number;
   readonly address: string
-  // readonly private_key: string
+  readonly role: string
   readonly login_pin: number;
+  readonly accountNumber: number;
+  readonly accountName: string;
+  readonly bankName: string;
   readonly transaction_pin: number;
   readonly active: boolean;
   readonly createdDate: Date;

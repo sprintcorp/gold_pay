@@ -1,5 +1,6 @@
-import { IsEmail, IsNotEmpty, IsOptional, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, MaxLength, MinLength, NotEquals, IsEnum } from "class-validator";
 import { Exclude, Expose } from "class-transformer";
+import { UserRoles } from "src/utils/roles.utils";
 
 export class AuthDto{
 
@@ -32,6 +33,11 @@ export class AuthDto{
   @MinLength(8)
   @IsOptional()
   public referral_code: string;
+
+  @IsOptional()
+  @IsEnum(UserRoles)
+  @NotEquals(UserRoles.ADMIN)
+  public role: UserRoles;
 
   public otp: number;
 

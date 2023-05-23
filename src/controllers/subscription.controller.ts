@@ -5,6 +5,7 @@ import { SubscriptionDto } from "../dto/subscription.dto";
 import { AuthGuard } from "../guards/auth.guard";
 import { response } from "express";
 
+
 @Controller('/api/v1/')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService,
@@ -17,7 +18,6 @@ export class SubscriptionController {
     const data = await this.subscriptionService.serviceSubscription(subscription, request)
     return response.status(200).json(data);
   }
-
 
   @UseGuards(AuthGuard)
   @Get('user/subscriptions')
