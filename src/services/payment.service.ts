@@ -33,8 +33,11 @@ export class PaymentService{
       }   
   }
 
-  async paymentList(id){
+  async paymentList(id, role){
     try{
+      if(role == 'admin'){
+        return await this.paymentListModel.findOne({_id:id});
+      }
         return await this.paymentListModel.findOne({_id:id});
     }catch(e){
         throw e;
@@ -104,8 +107,6 @@ export class PaymentService{
         }
     }
 
-    // console.log(pendingWithdraw[0].amount);
-    
     try{
         payment.user = request.user._id;
         payment.status = 'Awaiting-Approval' 
@@ -117,7 +118,7 @@ export class PaymentService{
   }
 
   async paymentHistory(request){
-    return await this.paymentHistoryModel.find({user:request.user});
+    return await this.paymentHistoryModel.find({user:request.user}).populate('paymentList');
   }
 
   async confrimPayment(id): Promise<any>{

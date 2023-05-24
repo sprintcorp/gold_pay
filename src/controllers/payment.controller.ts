@@ -40,8 +40,8 @@ export class PaymentController {
 
   @UseGuards(AuthGuard)
   @Get('payment-list/:id')
-  async paymentList(@Res() res, @Param('id') id): Promise<any>{
-      const data = await this.paymentService.paymentList(id);
+  async paymentList(@Res() res, @Param('id') id, @Req() req): Promise<any>{
+      const data = await this.paymentService.paymentList(id, req.user.role);
       return res.status(HttpStatus.OK).json(data);
   }
 

@@ -4,7 +4,7 @@ export class PaymentListDTO{
     @MaxLength(50)
     @MinLength(2)
     @IsNotEmpty()
-    amount: number;
+    currency: string;
   
     @MaxLength(50)
     @MinLength(2)
@@ -43,7 +43,7 @@ export class PaymentListDTO{
     @MaxLength(50)
     @MinLength(2)
     @IsOptional()
-    amount: number;
+    currency: string;
   
     @MaxLength(50)
     @MinLength(2)

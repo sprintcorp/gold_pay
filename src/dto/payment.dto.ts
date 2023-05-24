@@ -1,4 +1,5 @@
 import { IsEnum, IsNotEmpty, MaxLength, MinLength, NotEquals } from "class-validator";
+import { PaymentList } from "src/models/paymentList.schema";
 import { User } from "src/models/user.schema";
 import { PaymentType } from "src/utils/helper";
 
@@ -16,6 +17,9 @@ export class PaymentDTO{
     public type: PaymentType;
 
     public user:User;
+
+    @IsNotEmpty()
+    public paymentList:PaymentList;
 
   }
 
