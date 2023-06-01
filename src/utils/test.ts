@@ -83,27 +83,3 @@ let pancakeSwapAbi =  [
         let nairaRate= 750 // declare or retrieve dolar naira rate
         console.log(`TOKEN VALUE IN NGN: ${priceInBnb*bnbPrice*nairaRate} Naira`); // convert the token price from USD to Naira
     })();
-
-
-    {
-        asset_id: '1cbdfeb87544da4478cc0008d3a2ba47',
-        public_id: 'pickup/pickup-avatars/afmx3h4m26onobegbdsj',
-        version: 1685023155,
-        version_id: 'a8d82d2c9abb15cb0d467760e96df769',
-        signature: '9c17de43a2317058b5e4007c6675648d351fd628',
-        width: 800,
-        height: 999,
-        format: 'jpg',
-        resource_type: 'image',
-        created_at: '2023-05-25T13:59:15Z',
-        tags: [],
-        bytes: 58000,
-        type: 'upload',
-        etag: '56fea8dbd36595ad5d8366802e0c6b2b',
-        placeholder: false,
-        url: 'http://res.cloudinary.com/sprintcorp/image/upload/v1685023155/pickup/pickup-avatars/afmx3h4m26onobegbdsj.jpg',
-        secure_url: 'https://res.cloudinary.com/sprintcorp/image/upload/v1685023155/pickup/pickup-avatars/afmx3h4m26onobegbdsj.jpg',
-        folder: 'pickup/pickup-avatars',
-        original_filename: 'file',
-        api_key: '771228328885469'
-      }
