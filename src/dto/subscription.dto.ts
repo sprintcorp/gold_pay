@@ -6,6 +6,10 @@ export class SubscriptionDto {
   @MinLength(2)
   amount: number;
 
+  @MaxLength(50)
+  @MinLength(2)
+  result: number;
+
   @IsNotEmpty()
   type: string;
 
@@ -18,7 +22,7 @@ export class SubscriptionDto {
   @IsOptional()
   smartCard: string;
 
-  user: User
+  user: User;
 
   @IsOptional()
   description: string;

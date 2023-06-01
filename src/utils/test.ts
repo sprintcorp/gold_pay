@@ -1,0 +1,109 @@
+let pancakeSwapAbi =  [
+    {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"}],"name":"getAmountsOut","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"},
+    ];
+    let tokenAbi = [
+    {"inputs":[],"name":"decimals","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+    ];
+    const Web3 = require('web3');
+    
+    /*
+    Required Node.js
+    -- Web3 Token Charting --
+    Checkout my repo about building a clone of poocoin/dextools on bsc/pancakeswap and on any other similar chain/dex
+    https://github.com/Linch1/Web3TokenCharting
+    -- Usage --
+    1. Make a directory on your pc
+    2. Open a terminal 
+    3. go inside the created directory
+    4. run : npm init
+    5. run : npm i --save web3
+    6. Create a file: tokenPrice.js
+    7. Copy this text inside that file
+    8. run: node tokenPrice.js
+    */
+    
+    
+    let pancakeSwapContract = "0x10ED43C718714eb63d5aA57B78B54704E256024E".toLowerCase();
+    const web3 = new Web3("https://bsc-dataseed1.binance.org");
+    async function calcSell( tokensToSell, tokenAddres){
+        const web3 = new Web3("https://bsc-dataseed1.binance.org");
+        const BNBTokenAddress = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" //BNB
+    
+        let tokenRouter = await new web3.eth.Contract( tokenAbi, tokenAddres );
+        let tokenDecimals = await tokenRouter.methods.decimals().call();
+        
+        tokensToSell = setDecimals(tokensToSell, tokenDecimals);
+        let amountOut;
+        try {
+            let router = await new web3.eth.Contract( pancakeSwapAbi, pancakeSwapContract );
+            amountOut = await router.methods.getAmountsOut(tokensToSell, [tokenAddres ,BNBTokenAddress]).call();
+            amountOut =  web3.utils.fromWei(amountOut[1]);
+        } catch (error) {}
+        
+        if(!amountOut) return 0;
+        return amountOut;
+    }
+    async function calcBNBPrice(){
+        const web3 = new Web3("https://bsc-dataseed1.binance.org");
+        const BNBTokenAddress = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" //BNB
+        const USDTokenAddress  = "0x55d398326f99059fF775485246999027B3197955" //USDT
+        let bnbToSell = web3.utils.toWei("1", "ether") ;
+        let amountOut;
+        try {
+            let router = await new web3.eth.Contract( pancakeSwapAbi, pancakeSwapContract );
+            amountOut = await router.methods.getAmountsOut(bnbToSell, [BNBTokenAddress ,USDTokenAddress]).call();
+            amountOut =  web3.utils.fromWei(amountOut[1]);
+        } catch (error) {}
+        if(!amountOut) return 0;
+        return amountOut;
+    }
+    function setDecimals( number, decimals ){
+        number = number.toString();
+        let numberAbs = number.split('.')[0]
+        let numberDecimals = number.split('.')[1] ? number.split('.')[1] : '';
+        while( numberDecimals.length < decimals ){
+            numberDecimals += "0";
+        }
+        return numberAbs + numberDecimals;
+    }
+    /*
+    How it works?
+    This script simply comunicates with the smart contract deployed by pancakeswap and calls the main
+    function that was build to retrive the token prices
+    */
+    (async () => {
+        const tokenAddres = '0xFbbbab59A7EA75bB59BcB7a98e8f020d6De821E9'; // change this with the token addres that you want to know the 
+        let bnbPrice = await calcBNBPrice() // query pancakeswap to get the price of BNB in USDT
+        console.log(`CURRENT BNB PRICE: ${bnbPrice}`);
+        // Them amount of tokens to sell. adjust this value based on you need, you can encounter errors with high supply tokens when this value is 1.
+        let tokens_to_sell = 1; 
+        let priceInBnb = await calcSell(tokens_to_sell, tokenAddres)/tokens_to_sell; // calculate TOKEN price in BNB
+        console.log( 'TOKEN VALUE IN BNB : ' + priceInBnb + ' | Just convert it to USD ' );
+        console.log(`STOKEN VALUE IN USD: ${priceInBnb*bnbPrice}`); // convert the token price from BNB to USD based on the retrived BNB value
+        let nairaRate= 750 // declare or retrieve dolar naira rate
+        console.log(`TOKEN VALUE IN NGN: ${priceInBnb*bnbPrice*nairaRate} Naira`); // convert the token price from USD to Naira
+    })();
+
+
+    {
+        asset_id: '1cbdfeb87544da4478cc0008d3a2ba47',
+        public_id: 'pickup/pickup-avatars/afmx3h4m26onobegbdsj',
+        version: 1685023155,
+        version_id: 'a8d82d2c9abb15cb0d467760e96df769',
+        signature: '9c17de43a2317058b5e4007c6675648d351fd628',
+        width: 800,
+        height: 999,
+        format: 'jpg',
+        resource_type: 'image',
+        created_at: '2023-05-25T13:59:15Z',
+        tags: [],
+        bytes: 58000,
+        type: 'upload',
+        etag: '56fea8dbd36595ad5d8366802e0c6b2b',
+        placeholder: false,
+        url: 'http://res.cloudinary.com/sprintcorp/image/upload/v1685023155/pickup/pickup-avatars/afmx3h4m26onobegbdsj.jpg',
+        secure_url: 'https://res.cloudinary.com/sprintcorp/image/upload/v1685023155/pickup/pickup-avatars/afmx3h4m26onobegbdsj.jpg',
+        folder: 'pickup/pickup-avatars',
+        original_filename: 'file',
+        api_key: '771228328885469'
+      }
