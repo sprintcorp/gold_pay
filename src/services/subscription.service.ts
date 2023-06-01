@@ -39,6 +39,7 @@ export class SubscriptionService{
 
     const debitBalance = request.user.debit + subscription.result;
 
+    delete subscription['result']
     await new this.subscriptionModel(subscription).save();
     await this.userModel.findByIdAndUpdate(request.user._id,
        {balance:newBalance, debit:debitBalance}, { new: true });
