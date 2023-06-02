@@ -32,9 +32,9 @@ export class SubscriptionService{
 
     const actionURL = url.getSubscriptionURL();
 
-    // const response = await this.httpService.axiosRef.get(actionURL);
+    const response = await this.httpService.axiosRef.get(actionURL);
 
-    // subscription.transactionId = response.data.orderid;
+    subscription.transactionId = response.data.orderid;
     subscription.transactionId = Helper.uniqueRandomNumber(10);
 
     const newBalance = request.user.balance - subscription.result;
@@ -48,8 +48,7 @@ export class SubscriptionService{
     const user = await this.userModel.findByIdAndUpdate(request.user._id,
        {balance:newBalance, debit:debitBalance}, { new: true });
     
-    return user;
-
+    return response;
 
   }
 
