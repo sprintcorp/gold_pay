@@ -20,7 +20,7 @@ export class SubscriptionService{
       throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
     }
 
-    if(request.user.balance== 0 || request.user.balance < subscription.amount){
+    if(request.user.balance == 0 || request.user.balance < subscription.amount){
       throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
     }
 
@@ -34,6 +34,7 @@ export class SubscriptionService{
 
     const response = await this.httpService.axiosRef.get(actionURL);
 
+
     subscription.transactionId = response.data.orderid;
     subscription.transactionId = Helper.uniqueRandomNumber(10);
 
@@ -41,6 +42,7 @@ export class SubscriptionService{
 
     const debitBalance = request.user.debit + subscription.result;
 
+    
     delete subscription['result']
 
     await new this.subscriptionModel(subscription).save();
@@ -48,15 +50,12 @@ export class SubscriptionService{
     const user = await this.userModel.findByIdAndUpdate(request.user._id,
        {balance:newBalance, debit:debitBalance}, { new: true });
     
-    return response;
-
+    return response.data;
   }
 
   async getSubscriptions(request){
     const subscription = await this.subscriptionModel.find({user:request.user._id});
     return subscription;
   }
-
-
   
 }
