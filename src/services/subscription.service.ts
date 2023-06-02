@@ -6,6 +6,7 @@ import { SubscriptionDto } from "../dto/subscription.dto";
 import { HttpService } from "@nestjs/axios";
 import { URLSwitch } from "src/utils/URLSwitch";
 import { User, UserDocument } from "src/models/user.schema";
+import { Helper } from "src/utils/helper";
 
 @Injectable()
 export class SubscriptionService{
@@ -31,20 +32,23 @@ export class SubscriptionService{
 
     const actionURL = url.getSubscriptionURL();
 
-    const response = await this.httpService.axiosRef.get(actionURL);
+    // const response = await this.httpService.axiosRef.get(actionURL);
 
-    subscription.transactionId = response.data.orderid;
+    // subscription.transactionId = response.data.orderid;
+    subscription.transactionId = Helper.uniqueRandomNumber(10);
 
     const newBalance = request.user.balance - subscription.result;
 
     const debitBalance = request.user.debit + subscription.result;
 
     delete subscription['result']
+
     await new this.subscriptionModel(subscription).save();
-    await this.userModel.findByIdAndUpdate(request.user._id,
+
+    const user = await this.userModel.findByIdAndUpdate(request.user._id,
        {balance:newBalance, debit:debitBalance}, { new: true });
     
-    return response.data;
+    return user;
 
 
   }
