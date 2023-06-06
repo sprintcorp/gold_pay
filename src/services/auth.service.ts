@@ -261,7 +261,7 @@ export class AuthService {
       const sender_balance = parseFloat(request.user.balance) - parseFloat(user.amount);
       const sender_debit = parseFloat(request.user.debit) + parseFloat(user.amount);
       
-      const receiver_balance = parseFloat(receiver.balance) + parseFloat(user.amount);
+      const receiver_balance = receiver.balance + parseFloat(user.amount);
 
       await this.userModel.findByIdAndUpdate(request.user._id,
         {balance: sender_balance, debit:sender_debit},{ new: true })
