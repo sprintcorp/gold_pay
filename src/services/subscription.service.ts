@@ -20,7 +20,9 @@ export class SubscriptionService{
       throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
     }
 
-    if(request.user.balance == 0 || request.user.balance < subscription.amount){
+    console.log(request.user);
+
+    if(parseFloat(request.user.balance) == 0 || parseFloat(request.user.balance) < parseFloat(subscription.result)){
       throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
     }
 
@@ -36,19 +38,27 @@ export class SubscriptionService{
 
 
     subscription.transactionId = response.data.orderid;
-    subscription.transactionId = Helper.uniqueRandomNumber(10);
+    // subscription.transactionId = Helper.uniqueRandomNumber(10);
 
-    const newBalance = request.user.balance - subscription.result;
+    const newBalance = parseFloat(request.user.balance) - parseFloat(subscription.result);
 
-    const debitBalance = request.user.debit + subscription.result;
+    const debitBalance = parseFloat(request.user.debit) + parseFloat(subscription.result);
 
-    
+    // return newBalance;
     delete subscription['result']
 
     await new this.subscriptionModel(subscription).save();
 
-    const user = await this.userModel.findByIdAndUpdate(request.user._id,
-       {balance:newBalance, debit:debitBalance}, { new: true });
+    console.log(newBalance);
+
+    // const user = await this.userModel.findByIdAndUpdate(request.user._id,
+    //    {balance:newBalance, debit:debitBalance});
+
+       request.user.balance = newBalance;
+       request.user.debit = debitBalance;
+       await request.user.save();
+
+    // return request.user;
     
     return response.data;
   }

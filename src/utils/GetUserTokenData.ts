@@ -24,6 +24,7 @@ export class GetUserTokenData{
             const dataSent = {'address':address};
             const data = await this.httpService.axiosRef.post(
                 process.env.ANDA_TOKEN_URL+'agd/get-balance', dataSent);
+                console.log(data.data);
             return data.data.result;
             }catch(error){
                 throw error;

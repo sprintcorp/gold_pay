@@ -33,6 +33,12 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
 
+    const httpReq = new http();
+    const tokenRes = new GetUserTokenData(httpReq);
+    const data = await tokenRes.getWalletInformation()
+    user.address = data.address;
+    user.private_key = data.privateKey;
+
     const usernameExist = await this.userModel.findOne({username: user.username}).exec()
 
     if(usernameExist){
@@ -66,12 +72,14 @@ export class AuthService {
       const data = user.user.address ? 
       await tokenRes.getUserWalletBallance(user.user.address) : user.user.balance;
       
-      console.log(data);
+      
       let balance = data;
 
-      if(user.user.balance < data && user.user.balance > 0){
-        balance = data - user.user.debit;
+      if(user.user.balance <= data && user.user.balance >= 0){
+        balance = parseFloat(data) - parseFloat(user.user.debit);
       }
+
+      console.log(balance);
 
       const userData = await this.userModel.findByIdAndUpdate(user.user._id,{balance:balance,
          blockchain_balance: data},{ new: true });
@@ -231,9 +239,9 @@ export class AuthService {
       throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
     }
 
-    // if(request.user.balance== 0 || request.user.balance < user.amount){
-    //   throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
-    // }
+    if(parseFloat(request.user.balance)== 0 || parseFloat(request.user.balance) < parseFloat(user.amount)){
+      throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
+    }
 
     const receiver = await this.userModel.findOne({$or:[{email:user.user}, 
       {username: user.user}]}).exec();
@@ -250,15 +258,16 @@ export class AuthService {
     try {
 
     
-      const sender_balance = request.user.balance - parseInt(user.amount);
+      const sender_balance = parseFloat(request.user.balance) - parseFloat(user.amount);
+      const sender_debit = parseFloat(request.user.debit) + parseFloat(user.amount);
       
-      const receiver_balance = receiver.balance + parseInt(user.amount);
+      const receiver_balance = parseFloat(receiver.balance) + parseFloat(user.amount);
 
       await this.userModel.findByIdAndUpdate(request.user._id,
-        {balance: sender_balance},{ new: true }).exec()
+        {balance: sender_balance, debit:sender_debit},{ new: true })
 
       await this.userModel.findByIdAndUpdate(receiver._id,
-        {balance: receiver_balance},{ new: true }).exec()
+        {balance: receiver_balance},{ new: true })
 
       await session.commitTransaction();
       

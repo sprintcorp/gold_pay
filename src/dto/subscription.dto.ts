@@ -4,11 +4,12 @@ import { IsNotEmpty, IsOptional, MaxLength, MinLength } from "class-validator";
 export class SubscriptionDto {
   @MaxLength(50)
   @MinLength(2)
+  @IsOptional()
   amount: number;
 
   @MaxLength(50)
   @MinLength(2)
-  result: number;
+  result: string;
 
   @IsNotEmpty()
   type: string;

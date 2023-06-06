@@ -9,6 +9,7 @@ export class UserResources{
             'lastname': user.lastname,
             'role': user.role,
             'balance': user.balance,
+            'debit': user.debit,
             'email': user.email,
             'bank_name': user.bankName,
             'account_number': user.accountNumber,

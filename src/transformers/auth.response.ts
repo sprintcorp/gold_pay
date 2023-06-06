@@ -13,6 +13,7 @@ export interface UserEntity extends Document{
   readonly referral_code: string;
   readonly otp: number;
   readonly balance: number;
+  readonly debit: number;
   readonly address: string
   readonly role: string
   readonly login_pin: number;
