@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   // @OnEvent('verify_mail')
-  async signup(user: AuthDto, @Res() response):Promise<UserEntity>{
+  async signup(user: AuthDto, @Res() response):Promise<any>{
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(user.password, salt);
 
@@ -38,6 +38,8 @@ export class AuthService {
     const data = await tokenRes.getWalletInformation()
     user.address = data.address;
     user.private_key = data.privateKey;
+    // console.log(user);
+    // return user;
 
     const usernameExist = await this.userModel.findOne({username: user.username}).exec()
 
@@ -51,6 +53,8 @@ export class AuthService {
       firstname: user.firstname,
       lastname: user.lastname,
       username: user.username,
+      address: user.address,
+      private_key: user.private_key,
       password: hash
     }
 
