@@ -149,6 +149,7 @@ export class AuthController {
   @Post('/user/token-transfer')
   async TransferToken(@Res() response, @Req() request, @Body() user: TokenDto){
     const data = await this.authService.transferToken(user, request);
+    // return response.status(200).json(data)
     return response.status(data.status).json(data.response)
   }
 }

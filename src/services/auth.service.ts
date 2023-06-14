@@ -79,7 +79,7 @@ export class AuthService {
       
       let balance = data;
 
-      if(user.user.balance <= data && user.user.balance >= 0){
+      if(user.user.balance <= data && user.user.balance >= 0 && data != 0){
         balance = parseFloat(data) - parseFloat(user.user.debit);
       }
 
@@ -248,39 +248,48 @@ export class AuthService {
     }
 
     const receiver = await this.userModel.findOne({$or:[{email:user.user}, 
-      {username: user.user}]}).exec();
+      {username: user.user}]});
 
       if(!receiver){
         throw new HttpException('User does not exist', HttpStatus.NOT_FOUND)
       }
 
-
-    const session = await this.connection.startSession();
- 
-    session.startTransaction();
+      console.log(receiver);
+      
+      // const session = await this.connection.startSession();
+  
+      // session.startTransaction();
 
     try {
 
-    
       const sender_balance = parseFloat(request.user.balance) - parseFloat(user.amount);
       const sender_debit = parseFloat(request.user.debit) + parseFloat(user.amount);
       
       const receiver_balance = receiver.balance + parseFloat(user.amount);
+      // const blockchain_balance = receiver.balance + parseFloat(user.amount);
+
+      // return {'sender':sender_balance, 'receiver':receiver_balance};
 
       await this.userModel.findByIdAndUpdate(request.user._id,
         {balance: sender_balance, debit:sender_debit},{ new: true })
 
+        // receiver.firstname = receiver_balance;
+        // await receiver.save();
       await this.userModel.findByIdAndUpdate(receiver._id,
         {balance: receiver_balance},{ new: true })
 
-      await session.commitTransaction();
+
+
+      
+
+      // await session.commitTransaction();
       
     } catch (error) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       throw error;
     }
-    session.endSession();
-    return { 'response': `Token tranferred to ${user.user} successfully`, 'status': HttpStatus.OK };
+      // session.endSession();
+      return { 'response': `Token tranferred to ${user.user} successfully`, 'status': HttpStatus.OK };
   }
 
   async getOne(email): Promise<UserEntity> {
