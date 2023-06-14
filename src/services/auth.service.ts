@@ -71,7 +71,7 @@ export class AuthService {
       const httpReq = new http();
       const tokenRes = new GetUserTokenData(httpReq);
 
-      const userBal = user.user.debit + user.user.debit;
+      // const userBal = user.user.debit + user.user.debit;
 
       const walletBalance = user.user.address ? 
       await tokenRes.getUserWalletBallance(user.user.address) : user.user.balance;
@@ -82,11 +82,11 @@ export class AuthService {
 
       let balance = data;
 
-      if(data > 0 && user.user.balance <= data && user.user.balance >= 0){
-        balance = parseFloat(data) - parseFloat(user.user.debit);
-      }
+      // if(data > 0 && user.user.balance <= data && user.user.balance >= 0){
+      //   balance = parseFloat(data) - parseFloat(user.user.debit);
+      // }
 
-      // console.log(balance);
+      console.log(balance);
 
       const userData = await this.userModel.findByIdAndUpdate(user.user._id,{balance:balance,
          blockchain_balance: walletBalance},{ new: true });
@@ -111,7 +111,8 @@ export class AuthService {
     //   foundUser = await this.userModel.findOne({ username: user.username, active:true }).exec();
     // }
 
-    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.username}, {username: user.username}], active:true}]}).exec();
+    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.username},
+       {username: user.username}], active:true}]}).exec();
 
     if (foundUser) {
       const { password } = foundUser;
