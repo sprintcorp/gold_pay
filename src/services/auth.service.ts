@@ -275,17 +275,12 @@ export class AuthService {
       // return {'sender':sender_balance, 'receiver':receiver_balance};
 
       await this.userModel.findByIdAndUpdate(request.user._id,
-        {balance: sender_balance, debit:sender_debit},{ new: true })
+        {balance: sender_balance, debit:sender_debit},{ new: true });
 
-        // receiver.firstname = receiver_balance;
-        // await receiver.save();
       await this.userModel.findByIdAndUpdate(receiver._id,
-        {balance: receiver_balance},{ new: true })
-
-
-
+        {balance: receiver_balance},{ new: true });
       
-
+      return { 'response': `Token tranferred to ${user.user} successfully`, 'status': HttpStatus.OK };
       // await session.commitTransaction();
       
     } catch (error) {
@@ -293,7 +288,7 @@ export class AuthService {
       throw error;
     }
       // session.endSession();
-      return { 'response': `Token tranferred to ${user.user} successfully`, 'status': HttpStatus.OK };
+      
   }
 
   async getOne(email): Promise<UserEntity> {
