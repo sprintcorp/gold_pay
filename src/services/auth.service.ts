@@ -73,17 +73,20 @@ export class AuthService {
 
       const userBal = user.user.debit + user.user.debit;
 
-      const data = user.user.address ? 
+      const walletBalance = user.user.address ? 
       await tokenRes.getUserWalletBallance(user.user.address) : user.user.balance;
       
-      
+      const data = walletBalance > 0 ? walletBalance : user.user.balance;
+
+      console.log(data)
+
       let balance = data;
 
       if(user.user.balance <= data && user.user.balance >= 0 && data != 0){
         balance = parseFloat(data) - parseFloat(user.user.debit);
       }
 
-      console.log(balance);
+      // console.log(balance);
 
       const userData = await this.userModel.findByIdAndUpdate(user.user._id,{balance:balance,
          blockchain_balance: data},{ new: true });
