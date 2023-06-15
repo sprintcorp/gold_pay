@@ -30,9 +30,9 @@ export class SubscriptionService{
 
     
     
+    
     const url = new URLSwitch(subscription.type, subscription.network, subscription.amount, 
       subscription.subscriptionNumber, subscription.subPackage ?? '', subscription.smartCard ?? '');
-    
     
     const actionURL = url.getSubscriptionURL();
 

@@ -133,7 +133,7 @@ export class AuthService {
     const foundUser = await this.userModel.findOne({ email: user.email, active:false }).exec();
 
     if(foundUser){
-      if(foundUser.otp === user.otp){
+      if(foundUser.otp == user.otp){
         await this.userModel.findByIdAndUpdate(foundUser._id, {active:true}, { new: true });
         return "User activated successfully.";
       }else{
@@ -146,14 +146,18 @@ export class AuthService {
 
   async sendVerificationOTP(user: User): Promise<any>{
     
-    const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.email}, {username: user.username}], active:true}]}).exec();
+    const foundUser = await this.userModel.findOne({email:user.email});
 
-    if(foundUser){
+    if(!foundUser){
+      return new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+
+    if(!foundUser.active){
         const otp = Math.floor(100000 + Math.random() * 900000);
         await this.userModel.findByIdAndUpdate(foundUser._id, {otp:otp, expiryDate:Helper.addTime(15)}, { new: true });
         return otp;
     }else{
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('User does nt have an inactive account', HttpStatus.NOT_FOUND)
     }
   }
 
