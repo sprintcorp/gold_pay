@@ -24,7 +24,7 @@ export class SubscriptionService{
 
     // console.log(request.user);
 
-    if(parseFloat(request.user.balance) == 0 || parseFloat(request.user.balance) < parseFloat(subscription.result)){
+    if(parseFloat(request.user.balance) < parseFloat(subscription.result)){
       throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
     }
 
@@ -33,8 +33,10 @@ export class SubscriptionService{
     
     const url = new URLSwitch(subscription.type, subscription.network, subscription.amount, 
       subscription.subscriptionNumber, subscription.subPackage ?? '', subscription.smartCard ?? '');
-    
+
     const actionURL = url.getSubscriptionURL();
+
+    console.log(actionURL);
 
     const response = await this.httpService.axiosRef.get(actionURL);
 

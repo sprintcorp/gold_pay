@@ -31,13 +31,15 @@ export class URLSwitch{
                 `&MobileNumber= ${this.userId}&RequestID=request_id&CallBackURL=${process.env.CALLBACK_URL}`;
                 break;
             case 'cable':
-                url=`https://www.nellobytesystems.com/APICableTVV1.asp?UserID=${process.env.CONNECT_USER_ID}&`+
-                `APIKey=${process.env.CONNECT_API_KEY}&CableTV=${this.network}&Package=${this.subPackage}&SmartCardNo=${this.smartCard}`+
+                url=`https://www.nellobytesystems.com/APICableTVV1.asp?UserID=${process.env.CONNECT_USER_ID}&` +
+                `APIKey=${process.env.CONNECT_API_KEY}&CableTV=${this.network}&Package=${this.subPackage}&SmartCardNo=${this.smartCard}` +
                 `&PhoneNo=${this.userId}&RequestID=request_id&CallBackURL=${process.env.CALLBACK_URL}`;
+                break;
             case 'electricity':
-                url=`https://www.nellobytesystems.com/APIElectricityV1.asp?UserID=${process.env.CONNECT_USER_ID}&APIKey=${process.env.CONNECT_API_KEY}`+
-                `&ElectricCompany=${this.network}&MeterType=${this.subPackage}&MeterNo=${this.smartCard}&Amount=${this.amount}`+
+                url=`https://www.nellobytesystems.com/APIElectricityV1.asp?UserID=${process.env.CONNECT_USER_ID}&APIKey=${process.env.CONNECT_API_KEY}` +
+                `&ElectricCompany=${this.network}&MeterType=${this.subPackage}&MeterNo=${this.smartCard}&Amount=${this.amount}` +
                 `&PhoneNo=${this.userId}&RequestID=request_id&CallBackURL=${process.env.CALLBACK_URL}`;
+                break;
             default:
                 url=``;
         }

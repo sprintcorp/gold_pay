@@ -27,7 +27,6 @@ export class isAuthenticated implements NestMiddleware {
                 }
             } else {
                 throw new HttpException('No token found', HttpStatus.NOT_FOUND)
-
             }
         }catch {
             throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)

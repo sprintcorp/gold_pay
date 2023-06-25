@@ -112,7 +112,9 @@ export class AuthService {
     // }
 
     const foundUser = await this.userModel.findOne({$and: [{$or:[{email:user.username},
-       {username: user.username}], active:true}]}).exec();
+       {username: user.username}], active:true}]});
+
+    // console.log(foundUser);
 
     if (foundUser) {
       const { password } = foundUser;
