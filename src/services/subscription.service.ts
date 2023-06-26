@@ -15,7 +15,6 @@ export class SubscriptionService{
   }
 
   async serviceSubscription(subscription: SubscriptionDto, request){
-
     
     if(request.user.transaction_pin != subscription.transactionPin){
       throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
@@ -28,9 +27,6 @@ export class SubscriptionService{
       throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
     }
 
-    
-    
-    
     const url = new URLSwitch(subscription.type, subscription.network, subscription.amount, 
       subscription.subscriptionNumber, subscription.subPackage ?? '', subscription.smartCard ?? '');
 
