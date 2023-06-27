@@ -33,34 +33,43 @@ export class SubscriptionService{
     const actionURL = url.getSubscriptionURL();
 
     console.log(actionURL);
-
+    try{
     const response = await this.httpService.axiosRef.get(actionURL);
+   
 
-    // return response.data;
-    subscription.transactionId = response.data.orderid;
+      if(response.data.status == 'ORDER_RECEIVED'){
+    
+        subscription.transactionId = response.data.orderid;
 
-    const newBalance = parseFloat(request.user.balance) - parseFloat(subscription.result);
+        const newBalance = parseFloat(request.user.balance) - parseFloat(subscription.result);
 
-    const debitBalance = parseFloat(request.user.debit) + parseFloat(subscription.result);
+        const debitBalance = parseFloat(request.user.debit) + parseFloat(subscription.result);
 
-  
-    delete subscription['result']
+      
+        delete subscription['result']
 
-    await new this.subscriptionModel(subscription).save();
+        await new this.subscriptionModel(subscription).save();
 
-    // console.log(newBalance);
+        request.user.balance = newBalance;
+        request.user.debit = debitBalance;
+        request.user.username = request.user.username ? request.user.username :
+        'user_'+request.user.firstname+request.user.lastname;
 
-    // const user = await this.userModel.findByIdAndUpdate(request.user._id,
-    //    {balance:newBalance, debit:debitBalance});
+        await request.user.save();
 
-    request.user.balance = newBalance;
-    request.user.debit = debitBalance;
-    request.user.username = request.user.username ? request.user.username :
-    'user_'+request.user.firstname+request.user.lastname;
+        return response.data;
+      }
+    throw new HttpException(response.data.status, 400)
+    }catch(error){
+      throw new HttpException(error, HttpStatus.FORBIDDEN)
+    }
+  }
 
-    await request.user.save();
 
-    return response.data;
+  data: {
+    orderid: '6496611751',
+    statuscode: '100',
+    status: 'ORDER_RECEIVED'
   }
 
   async getSubscriptions(request){
