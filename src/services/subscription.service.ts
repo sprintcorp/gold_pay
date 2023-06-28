@@ -66,12 +66,6 @@ export class SubscriptionService{
   }
 
 
-  data: {
-    orderid: '6496611751',
-    statuscode: '100',
-    status: 'ORDER_RECEIVED'
-  }
-
   async getSubscriptions(request){
     const subscription = await this.subscriptionModel.find({user:request.user._id});
     return subscription;
