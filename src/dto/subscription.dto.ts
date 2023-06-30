@@ -31,10 +31,15 @@ export class SubscriptionDto {
   @IsNotEmpty()
   subscriptionNumber: string;
 
+  // @IsNotEmpty()
+  // @MaxLength(6)
+  // @MinLength(6)
+  // transactionPin: string;
+
   @IsNotEmpty()
   @MaxLength(6)
   @MinLength(6)
-  transactionPin: string;
+  loginPin: string;
 
   transactionId:string;
 }

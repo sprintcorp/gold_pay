@@ -16,8 +16,8 @@ export class SubscriptionService{
 
   async serviceSubscription(subscription: SubscriptionDto, request){
     
-    if(request.user.transaction_pin != subscription.transactionPin){
-      throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
+    if(request.user.login_pin != subscription.loginPin){
+      throw new HttpException('Invalid pin', HttpStatus.FORBIDDEN)
     }
     // return subscription;
 
@@ -25,6 +25,14 @@ export class SubscriptionService{
 
     if(parseFloat(request.user.balance) < parseFloat(subscription.result)){
       throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
+    }
+
+    if(subscription.type == 'electricity'){
+      const meterUrl = `https://www.nellobytesystems.com/APIVerifyElectricityV1.asp?UserID=${process.env.CONNECT_USER_ID}&APIKey=${process.env.CONNECT_API_KEY}&ElectricCompany=${subscription.network}&MeterNo=${subscription.smartCard}`;
+      const meterVerification = await this.httpService.axiosRef.get(meterUrl);
+      if(meterVerification.data.status != 100){
+        throw new HttpException('Invalid meter number', 400);
+      }
     }
 
     const url = new URLSwitch(subscription.type, subscription.network, subscription.amount, 
@@ -56,7 +64,7 @@ export class SubscriptionService{
         'user_'+request.user.firstname+request.user.lastname;
 
         await request.user.save();
-
+        console.log(response);
         return response.data;
       }
     throw new HttpException(response.data.status, 400)
