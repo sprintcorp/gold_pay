@@ -8,6 +8,11 @@ export class PaymentDTO{
     @MinLength(2)
     @IsNotEmpty()
     public amount: number;
+
+    @MaxLength(50)
+    @MinLength(2)
+    @IsNotEmpty()
+    public result: number;
   
     @MaxLength(50)
     @MinLength(7)
@@ -28,6 +33,11 @@ export class PaymentDTO{
     @MinLength(2)
     @IsNotEmpty()
     public amount: number;
+
+    @MaxLength(50)
+    @MinLength(2)
+    @IsNotEmpty()
+    public result: number;
   
     @MaxLength(50)
     @MinLength(7)

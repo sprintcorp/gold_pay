@@ -86,21 +86,21 @@ export class PaymentService{
         throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
     }
   
-    if(request.user.balance== 0 || request.user.balance < payment.amount){
+    if(request.user.balance== 0 || request.user.balance < payment.result){
         throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
     }
 
     const pendingWithdraw = await this.paymentHistoryModel.
     aggregate([
         { $match: { user: request.user._id , type: 'withdraw'} },
-        { $group: { _id: null, amount: { $sum: "$amount" } } }
+        { $group: { _id: null, result: { $sum: "$amount" } } }
     ]);
 
-    console.log(pendingWithdraw[0].amount);
+    console.log(pendingWithdraw[0].result);
 
     if(pendingWithdraw){
-        const availableBalance = pendingWithdraw[0].amount + parseInt(payment.amount);
-        const possibleAmount = request.user.balance - pendingWithdraw[0].amount;
+        const availableBalance = pendingWithdraw[0].result + parseInt(payment.result);
+        const possibleAmount = request.user.balance - pendingWithdraw[0].result;
 
         if(availableBalance > request.user.balance){
             throw new HttpException(`You have insufficient account balance because of pending withdraw, your possible withdraw amount is ${possibleAmount}`, HttpStatus.FORBIDDEN)
@@ -146,12 +146,12 @@ export class PaymentService{
 
         const user = await this.userModel.findById(paymentApproved.user);
 
-        let balance = user.balance + paymentApproved.amount;
-        let blockchainBalance = user.blockchain_balance + paymentApproved.amount;
+        let balance = user.balance + paymentApproved.result;
+        let blockchainBalance = user.blockchain_balance + paymentApproved.result;
 
         if(payment.type == 'withdraw'){
-            balance = user.balance - paymentApproved.amount;
-            blockchainBalance = user.blockchain_balance - paymentApproved.amount;
+            balance = user.balance - paymentApproved.result;
+            blockchainBalance = user.blockchain_balance - paymentApproved.result;
         }
 
         await this.userModel.findByIdAndUpdate(paymentApproved.user,

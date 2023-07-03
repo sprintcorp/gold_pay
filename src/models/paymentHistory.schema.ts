@@ -11,6 +11,9 @@ export class PaymentHistory{
   amount: number;
 
   @Prop()
+  result: number;
+
+  @Prop()
   type: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User" })
