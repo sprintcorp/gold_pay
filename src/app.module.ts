@@ -29,6 +29,8 @@ import { PaymentService } from "./services/payment.service";
 import { PaymentController } from "./controllers/payment.controller";
 import { APP_GUARD } from "@nestjs/core";
 import { RolesGuard } from "./utils/roles.guard";
+import { ScheduleModule } from "@nestjs/schedule";
+import { BullModule } from "@nestjs/bull";
 // import { SubscriptionModule } from "./modules/subscription.module";
 
 @Module({
@@ -39,12 +41,29 @@ import { RolesGuard } from "./utils/roles.guard";
       useClass: HttpConfigService,
     }),
 
+
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
     }),
-
+    ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
+
+    BullModule.forRootAsync({
+      useFactory: () => ({
+        redis: {
+          host: 'localhost',
+          port: 6379,
+        },
+        maxRetriesPerRequest: 50,
+      }),
+    }),
+
+    BullModule.registerQueueAsync(
+      {
+        name: 'subscription',
+      },
+    ),
     
     MailerModule.forRootAsync({
       useFactory: () => ({
@@ -61,9 +80,8 @@ import { RolesGuard } from "./utils/roles.guard";
           from:process.env.SMTP_EMAIL,
         },
         template: {
-          // dir: process.cwd() + '/templates/registration-email.hbs',
           dir: __dirname + '/templates',
-          adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
+          adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
           },
