@@ -29,7 +29,6 @@ import { PaymentService } from "./services/payment.service";
 import { PaymentController } from "./controllers/payment.controller";
 import { APP_GUARD } from "@nestjs/core";
 import { RolesGuard } from "./utils/roles.guard";
-import { ScheduleModule } from "@nestjs/schedule";
 // import { SubscriptionModule } from "./modules/subscription.module";
 
 @Module({
@@ -45,7 +44,7 @@ import { ScheduleModule } from "@nestjs/schedule";
       envFilePath: '.env',
       isGlobal: true,
     }),
-    ScheduleModule.forRoot(),
+    
     EventEmitterModule.forRoot(),
 
     
