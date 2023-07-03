@@ -249,8 +249,8 @@ export class AuthService {
   }
 
   async transferToken(user, request){
-    if(request.user.transaction_pin != user.transactionPin){
-      throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
+    if(request.user.login_pin != user.loginPin){
+      throw new HttpException('Invalid login pin', HttpStatus.FORBIDDEN)
     }
 
     if(parseFloat(request.user.balance)== 0 || parseFloat(request.user.balance) < parseFloat(user.amount)){

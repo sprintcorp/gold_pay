@@ -9,7 +9,7 @@ export class TokenDto{
 	@IsNotEmpty()
   @MaxLength(6)
   @MinLength(6)
-  transactionPin: number;
+  loginPin: number;
 
 	@MaxLength(50)
   @MinLength(2)
