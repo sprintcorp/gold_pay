@@ -4,8 +4,6 @@ import { MailerService } from "@nestjs-modules/mailer";
 import { SubscriptionDto } from "../dto/subscription.dto";
 import { AuthGuard } from "../guards/auth.guard";
 import { response } from "express";
-import { InjectQueue } from "@nestjs/bull";
-import { Queue } from "bull";
 
 
 @Controller('/api/v1/')

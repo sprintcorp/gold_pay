@@ -6,10 +6,6 @@ import { SubscriptionDto } from "../dto/subscription.dto";
 import { HttpService } from "@nestjs/axios";
 import { URLSwitch } from "src/utils/URLSwitch";
 import { User, UserDocument } from "src/models/user.schema";
-import { Helper } from "src/utils/helper";
-import { Cron } from "@nestjs/schedule";
-import { InjectQueue } from "@nestjs/bull";
-import { Queue } from "bull";
 import { MailerService } from "@nestjs-modules/mailer";
 
 @Injectable()

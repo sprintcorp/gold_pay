@@ -30,7 +30,6 @@ import { PaymentController } from "./controllers/payment.controller";
 import { APP_GUARD } from "@nestjs/core";
 import { RolesGuard } from "./utils/roles.guard";
 import { ScheduleModule } from "@nestjs/schedule";
-import { BullModule } from "@nestjs/bull";
 // import { SubscriptionModule } from "./modules/subscription.module";
 
 @Module({
@@ -49,21 +48,6 @@ import { BullModule } from "@nestjs/bull";
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
 
-    BullModule.forRootAsync({
-      useFactory: () => ({
-        redis: {
-          host: 'localhost',
-          port: 6379,
-        },
-        maxRetriesPerRequest: 50,
-      }),
-    }),
-
-    BullModule.registerQueueAsync(
-      {
-        name: 'subscription',
-      },
-    ),
     
     MailerModule.forRootAsync({
       useFactory: () => ({
