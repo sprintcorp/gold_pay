@@ -55,7 +55,8 @@ export class AuthService {
       username: user.username,
       address: user.address,
       private_key: user.private_key,
-      password: hash
+      password: hash,
+      otp: Math.floor(100000 + Math.random() * 900000)
     }
 
     const newUser = new this.userModel(reqBody).save();
