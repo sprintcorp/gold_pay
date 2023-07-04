@@ -221,8 +221,7 @@ export class AuthService {
       }else if (user.password !== user.confirm_password ){
         throw new HttpException("Password must be same as confirm password", HttpStatus.NOT_FOUND)
       }else{
-        const salt = await bcrypt.genSalt();
-        user.password = await bcrypt.hash(user.password, salt);
+        
       }
     }
 
@@ -238,6 +237,8 @@ export class AuthService {
      delete user['password'];
     }
 
+    const salt = await bcrypt.genSalt();
+    user.password = await bcrypt.hash(user.password, salt);
     const response = await this.userModel.findByIdAndUpdate(request.user._id, user, { new: true }).exec()
     return { 'response': response, 'status': HttpStatus.OK }
   }
