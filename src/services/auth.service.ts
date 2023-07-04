@@ -133,7 +133,11 @@ export class AuthService {
   }
 
   async activateAccount(user: User): Promise<any> {
-    const foundUser = await this.userModel.findOne({ email: user.email, active:false }).exec();
+    const foundUser = await this.userModel.findOne({ email: user.email}).exec();
+
+    if(foundUser.active){
+      return new HttpException('User account already verified', HttpStatus.NOT_FOUND)
+    }
 
     if(foundUser){
       if(foundUser.otp == user.otp){
