@@ -60,13 +60,13 @@ export class PaymentService{
 
   async depositRequest(payment: PaymentDTO, request){
     try{
-        if(request.user.accountNumber && request.user.bankName && request.user.accountName){
+        // if(request.user.accountNumber && request.user.bankName && request.user.accountName){
             payment.user = request.user._id;
             const data =  await new this.paymentHistoryModel(payment).save();
             return data;
-        }
-        throw new HttpException('Pls fill in your account information to perform deposit action'
-        , HttpStatus.PRECONDITION_REQUIRED)
+        // }
+        // throw new HttpException('Pls fill in your account information to perform deposit action'
+        // , HttpStatus.PRECONDITION_REQUIRED)
       }catch(e){
         throw e;
       }
