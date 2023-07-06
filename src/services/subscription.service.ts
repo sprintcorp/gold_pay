@@ -63,8 +63,8 @@ export class SubscriptionService{
 
         await new this.subscriptionModel(subscription).save();
 
-        // request.user.balance = newBalance;
-        request.user.balance = 600;
+        request.user.balance = newBalance;
+        // request.user.balance = 600;
         request.user.debit = debitBalance;
         request.user.username = request.user.username ? request.user.username :
         'user_'+request.user.firstname+request.user.lastname;
