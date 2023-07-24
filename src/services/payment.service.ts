@@ -82,7 +82,7 @@ export class PaymentService{
 
   async withdrawRequest(payment, request){
 
-    if(request.user.transaction_pin != payment.transaction_pin){
+    if(request.user.login_pin != payment.login_pin){
         throw new HttpException('Invalid transaction pin', HttpStatus.FORBIDDEN)
     }
   
@@ -90,15 +90,16 @@ export class PaymentService{
         throw new HttpException('You have insufficient balance, please deposit to continue this action', HttpStatus.FORBIDDEN)
     }
 
+
     const pendingWithdraw = await this.paymentHistoryModel.
     aggregate([
         { $match: { user: request.user._id , type: 'withdraw'} },
-        { $group: { _id: null, result: { $sum: "$amount" } } }
+        { $group: { _id: null, result: { $sum: "$result" } } }
     ]);
 
-    console.log(pendingWithdraw[0].result);
+    console.log(pendingWithdraw[0]);
 
-    if(pendingWithdraw){
+    if(pendingWithdraw.length > 0){
         const availableBalance = pendingWithdraw[0].result + parseInt(payment.result);
         const possibleAmount = request.user.balance - pendingWithdraw[0].result;
 

@@ -49,7 +49,7 @@ export class PaymentDTO{
     @MaxLength(6)
     @MinLength(6)
     @IsNotEmpty()
-    public transaction_pin: number;
+    public login_pin: number;
 
     public status: string;
 
