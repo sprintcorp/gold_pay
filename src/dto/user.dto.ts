@@ -44,12 +44,12 @@ export class UserDto{
   @IsOptional()
   @MaxLength(6)
   @MinLength(6)
-  public login_pin: number;
+  public login_pin: string;
 
   @IsOptional()
   @MaxLength(6)
   @MinLength(6)
-  public transaction_pin: number;
+  public transaction_pin: string;
 
   @IsOptional()
   @MaxLength(10)

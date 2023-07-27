@@ -49,10 +49,10 @@ export class User {
     otp: number
 
     @Prop({length:6, default: Math.floor(100000 + Math.random() * 900000)})
-    login_pin: number
+    login_pin: string
 
     @Prop({length:6})
-    transaction_pin: number
+    transaction_pin: string
 
     @Prop({default:0})
     balance:number
