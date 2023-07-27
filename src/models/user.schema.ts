@@ -64,7 +64,7 @@ export class User {
     debit:number
 
     @Prop()
-    accountNumber:number
+    accountNumber:string
 
     @Prop()
     accountName:string

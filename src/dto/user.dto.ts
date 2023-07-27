@@ -54,7 +54,7 @@ export class UserDto{
   @IsOptional()
   @MaxLength(10)
   @MinLength(10)
-  public accountNumber:number
+  public accountNumber:string;
 
   @IsOptional()
   public  accountName:string
