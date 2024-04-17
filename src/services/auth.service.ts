@@ -36,10 +36,10 @@ export class AuthService {
     const httpReq = new http();
     const tokenRes = new GetUserTokenData(httpReq);
     const data = await tokenRes.getWalletInformation()
+
     user.address = data.address;
     user.private_key = data.privateKey;
-    // console.log(user);
-    // return user;
+    
 
     const usernameExist = await this.userModel.findOne({username: user.username}).exec()
 

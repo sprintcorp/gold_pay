@@ -46,6 +46,7 @@ export class AuthController {
   async Signup(@Res() response, @Body() user: AuthDto):Promise<any> {
 
     const newUser = await this.authService.signup(user, response);
+    // return newUser;
 
     const otp = newUser.otp;
     
